@@ -22,7 +22,9 @@ function ubccourses_shortcode($atts,$content) {
           "department" => '',
           "course" => '',
           "pills" => false,
-          "pillcount" => 4
+          "pillcount" => 4,
+          "tabs" => false,
+          "tabcount" => 4
        ), $atts));
 
        //Add the javascript only once per page
@@ -54,7 +56,7 @@ function ubccourses_shortcode($atts,$content) {
        $output .= '<script> var ajaxurl = "'.$ajaxurl.'"; </script>';
 
        //Get Courses Data and display
-       $output .= show_dept_table($c_sessyr, $c_sesscd, $department ,$course, $pills, $pillcount);
+       $output .= show_dept_table($c_sessyr, $c_sesscd, $department ,$course, $pills, $pillcount, $tabs, $tabcount);
        return $output;  
 }
 
@@ -105,7 +107,7 @@ $output = '
 return $output;
 }
 
-function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pillcount) {
+function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pillcount,$tabs, $tabcount) {
        if ($course>0){$req = 3;}else{$req = 2;}
        $xml_src = 'http://courses.students.ubc.ca/cs/servlets/SRVCourseSchedule?'.'sessyr='.$c_sessyr.'&sesscd='.$c_sesscd.'&req='.$req.'&dept='.$department.'&course='.$course.'&output=3';    
        $XMLPayload = get_XML_data($xml_src);
@@ -123,7 +125,7 @@ function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pi
                foreach ($xml->course as $courses) { 
                   $params = "'".$c_sessyr."', '".$c_sesscd."', '".$department."', '".$courses['key']."' ";  
                   $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini" data-toggle="modal">Sections</a>';
-                  if (empty($course)&&($pills)){
+                  if (empty($course)&&($pills)||empty($course)&&($tabs)){
                     $cindex = substr($courses['key'], 0, 1);
                     $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
                   }
@@ -134,9 +136,12 @@ function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pi
        } else {
               $output = '<strong>Course(s) Not Found: Example [ubccourses department=ANTH] <br>(default is ALL courses add e.g. courses ="100A" for specific courses)</strong>';
        }
-       if (empty($course)&&($pills)){
+       if (empty($course)&&($pills)||empty($course)&&($tabs)){
           $tabcount = 0;
-          $tabhead = '<ul class="nav nav-pills btn-mini" id="tabs" data-tabs="tabs">';
+          if ($pills)
+            $tabhead = '<ul class="nav nav-pills btn-mini" id="tabs" data-tabs="tabs">';
+          else
+            $tabhead = '<ul class="nav nav-tabs btn-mini" id="tabs" data-tabs="tabs">';
           foreach ($coursetabs as $coursetab){
             $tabcount++;
             if ($tabcount <= $pillcount){
