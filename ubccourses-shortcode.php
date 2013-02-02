@@ -65,14 +65,21 @@ function get_XML_data($url){
     //Set boolean whether from transients
     $from_server = 0;
 
+    //set Default 
+    $dataerror = false;
+
     //Set Unique key using url
     $key = 'ubcc'.md5($url);
 
     //Get transient value
     $value = get_transient($key);
 
-    //If the transient does not exist or has expired, refresh it
-    if (empty($value)){
+    //Server provides no exceptions so need to check data for errors
+    //if value doesn't contain data
+    if (trim($xml) == '') {$dataerror = true;}
+
+    //If the transient does not exist or has expired or has no data, refresh it
+    if (empty($value) && ($dataerror)){
        $from_server = 1;
        $value = get_file_contents_from_calendar($url);
        set_transient($key,$value,180);
@@ -81,7 +88,7 @@ function get_XML_data($url){
 }
 
 function get_file_contents_from_calendar($url){
-    //Suppress errors - if any and trap for firewall issues with timeout
+    //Suppress errors - 
     $value = @file_get_contents($url); 
 
     //Clean up UBC's XML returns
@@ -118,24 +125,20 @@ function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pi
        else 
           $fserver_label = '<button class="btn btn-mini btn-success status" type="button">from Transients</button>';
        $count = 0;
-       foreach ($xml->course as $courses) {
-               $count++;
+       foreach ($xml->course as $courses) { 
+         $params = "'".$c_sessyr."', '".$c_sesscd."', '".$department."', '".$courses['key']."' ";  
+         $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini" data-toggle="modal">Sections</a>';
+         if (empty($course)&&($pills)||empty($course)&&($tabs)){
+            $cindex = substr($courses['key'], 0, 1);
+            $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
+         }
+         else{
+            $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
+         }
+         $count++;
        }
-       if( $count > 0 ) {      
-               foreach ($xml->course as $courses) { 
-                  $params = "'".$c_sessyr."', '".$c_sesscd."', '".$department."', '".$courses['key']."' ";  
-                  $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini" data-toggle="modal">Sections</a>';
-                  if (empty($course)&&($pills)||empty($course)&&($tabs)){
-                    $cindex = substr($courses['key'], 0, 1);
-                    $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
-                  }
-                  else{
-                    $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
-                  }
-              }
-       } else {
-              $output = '<strong>Course(s) Not Found: Example [ubccourses department=ANTH] <br>(default is ALL courses add e.g. courses ="100A" for specific courses)</strong>';
-       }
+       if( $count == 0 )
+         $output = '<strong>Course(s) Not Found: Example [ubccourses department=ANTH] <br>(default is ALL courses add e.g. courses ="100A" for specific courses)</strong>';
        if (empty($course)&&($pills)||empty($course)&&($tabs)){
           $tabcount = 0;
           if ($pills)

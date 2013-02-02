@@ -24,8 +24,5 @@ function getSectionData(sessyr,sesscd,department,course){
              },
              timeout: 3000
           });
-          //return false;
  }
 
-
-jQuery("#example").popover();  
