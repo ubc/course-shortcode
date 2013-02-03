@@ -159,7 +159,6 @@ function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pi
             }
           }
           $output = $tabhead.'</ul><div class="tab-content">'.$output.'</div>';
-          //print_r($coursetabs);
        }
        return $fserver_label.$output.display_modal();
 } 
@@ -182,7 +181,6 @@ function ubcsections_display_ajax () {
 
 function show_section_table($sessyr, $sesscd, $department,$course) {  
        $xml_src = 'http://courses.students.ubc.ca/cs/servlets/SRVCourseSchedule?'.'sessyr='.$sessyr.'&sesscd='.$sesscd.'&req=4&dept='.$department.'&course='.$course.'&output=3';
-       //$xml = simplexml_load_file($xml_src);
        $XMLPayload = get_XML_data($xml_src);
        $xml = simplexml_load_string(substr($XMLPayload,1));
        $from_server = $XMLPayload[0];
@@ -190,37 +188,29 @@ function show_section_table($sessyr, $sesscd, $department,$course) {
           $fserver_label = '<button class="btn btn-mini btn-danger status" type="button">from Server</button>';
        else 
           $fserver_label = '<button class="btn btn-mini btn-success status" type="button">from Transients</button>';
-       $count = 0;
-       foreach ($xml->section as $sections) {
-               $count++;
-       }
-       if( $count > 0 ) {      
-               $output .= '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>';
-               foreach ($xml->section as $sections) {           
+       $count = 0; 
+       $output = '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>'; 
+       foreach ($xml->section as $sections) {           
                    $ssc_link = "https://courses.students.ubc.ca/cs/main?"."pname=subjarea&tname=subjareas&req=5&dept=".$department."&course=".$course."&section=".$sections['key']."&sessyr=".$sessyr."&sesscd=".$sesscd;
                    $inst_link = "https://courses.students.ubc.ca/cs/main?pname=inst&ubcid=".$sections->instructors->instructor['ubcid'];
                    $output .= '<tr><td><a href="'.$ssc_link.'">'.$sections['key'].'</a></td><td>'.$sections['activity'].'</td>';
-
-//##############
-$meetings = $sections->teachingunits->teachingunit->meetings->meeting;
-$term =array();$day =array();$bld =array();
-foreach ($meetings as $meeting){
-        if (!in_array(trim($meeting['term']), $term))
-	   array_push($term,trim($meeting['term']));
-        if (!in_array(trim($meeting['day']), $day))
-	   array_push($day,trim($meeting['day']));
-        if (!in_array(trim($meeting['buildingcd']), $bld))
-	   array_push($bld,trim($meeting['buildingcd']));
-}
-$output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
-//##############
-
+                   $meetings = $sections->teachingunits->teachingunit->meetings->meeting;
+                   $term =array();$day =array();$bld =array();
+                   foreach ($meetings as $meeting){
+                      if (!in_array(trim($meeting['term']), $term))
+	                 array_push($term,trim($meeting['term']));
+                      if (!in_array(trim($meeting['day']), $day))
+	                 array_push($day,trim($meeting['day']));
+                      if (!in_array(trim($meeting['buildingcd']), $bld))
+	                 array_push($bld,trim($meeting['buildingcd']));
+                   }
+                   $output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
                    $output .= '<td><a href="'.$inst_link.'">'.$sections->instructors->instructor['name'].'</a></td></tr>';
-               }
-            $output .= '</table>';
-         } else {
-                       $output .= '<strong>This course ('.$department.$course.') is not offered in '.$sessyr.$sesscd.'.</strong>';
-         }
-         return $fserver_label.$output;
+				   $count ++;
+        }
+        $output .= '</table>';
+        if( $count == 0 ) 
+	           $output = '<br><strong>This course ('.$department.$course.') is not offered in '.$sessyr.$sesscd.'.</strong>';
+        return $fserver_label.$output;
 }
 ?>
