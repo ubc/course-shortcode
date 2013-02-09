@@ -91,7 +91,7 @@ function get_XML_data($url){
           }
           else{
              $from_server = 1;
-             set_transient($key,$value,10);
+             set_transient($key,$value,180);
           }
        }
        return $from_server.$value;
