@@ -1,4 +1,4 @@
-<?php
+?php
 /*
 Plugin Name: UBC Courses Shortcode
 Plugin URI: 
@@ -9,14 +9,15 @@ Licence: GPLv2
 Author URI: http://isit.arts.ubc.ca
 */
 
-//Define paths to JS folder
-define( 'ubccourses_INSERTJS', plugin_dir_url(__FILE__).'js' );
-define( 'ubccourses_INSERTCSS', plugin_dir_url(__FILE__).'css' );
-
 // Register a new shortcode: [ubccourses]
 add_shortcode("ubccourses", "ubccourses_shortcode");
 
-function ubccourses_shortcode($atts,$content) {
+function ubccourses_shortcode($atts) {
+
+       //Handle double call if Jetpack is installed
+       if ( !in_the_loop() )
+          return;
+
        // Defaults
        extract(shortcode_atts(array(
           "department" => '',
@@ -27,13 +28,13 @@ function ubccourses_shortcode($atts,$content) {
           "tabcount" => 4
        ), $atts));
 
+       //Define paths to JS folder
+       define( 'ubccourses_INSERTJS', plugin_dir_url(__FILE__).'js' );
+       define( 'ubccourses_INSERTCSS', plugin_dir_url(__FILE__).'css' );
+
        //Add the javascript only once per page
-       static $script_tobeadded = true;
-       if ($script_tobeadded) {
-            $output .= '<script type="text/javascript" src="'.ubccourses_INSERTJS.'/ubccourses.js"></script>';
-            $output .= '<link rel="stylesheet" type="text/css" href="'.ubccourses_INSERTCSS.'/style.css" />';
-            $script_tobeadded = false;
-       }
+       wp_enqueue_script('myscript', ubccourses_INSERTJS.'/ubccourses.js');
+       wp_enqueue_style('mystyle', ubccourses_INSERTCSS.'/style.css');
 
        //Get current year and session
        $curr_y = date('Y');
@@ -62,56 +63,75 @@ function ubccourses_shortcode($atts,$content) {
 
 function get_XML_data($url){
 
-    //Set boolean whether from transients
-    $from_server = 0;
+       //Set boolean whether from transients
+       $from_server = 0;
 
-    //set Default 
-    $dataerror = false;
+       //set Default 
+       $trans_has_data = true;
 
-    //Set Unique key using url
-    $key = 'ubcc'.md5($url);
+       //Set Unique key using url
+       $key = 'ubcc'.md5($url);
 
-    //Get transient value
-    $value = get_transient($key);
+       //Get transient value
+       $value = get_transient($key);
 
-    //Server provides no exceptions so need to check data for errors
-    //if value doesn't contain data
-    if (trim($xml) == '') {$dataerror = true;}
+       //Server provides no exceptions so need to check data for errors
+       //if value doesn't contain data
+       if (trim($value) == '') {$trans_has_data = false;}
 
-    //If the transient does not exist or has expired or has no data, refresh it
-    if (empty($value) && ($dataerror)){
-       $from_server = 1;
-       $value = get_file_contents_from_calendar($url);
-       set_transient($key,$value,180);
-    }
-    return $from_server.$value;
+       //if value doesn't contain "courses" or "sections"
+       if ( (strpos($value,'courses') <= 0) || (strpos($value,'sections') <= 0) ) {
+          $trans_has_data = false;
+       }
+
+       //If the transient does not exist or has expired or has no data, refresh it
+       if (empty($value) || ($trans_has_data)){
+          $value = get_file_contents_from_calendar($url);
+          if (!value){
+          }
+          else{
+             $from_server = 1;
+             set_transient($key,$value,10);
+          }
+       }
+       return $from_server.$value;
 }
 
 function get_file_contents_from_calendar($url){
-    //Suppress errors - 
-    $value = @file_get_contents($url); 
+       //Set timeout using stream context - 10secs??
+       $ctx = stream_context_create(array(
+           'http'=>array(
+                    'timeout'=> 10
+                   )
+       ));
+       
+       //Suppress errors - 
+       $value = @file_get_contents($url,0,$ctx); 
+       if (!$value)
+          return $value;
+       else{
 
-    //Clean up UBC's XML returns
-    $value = preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $value);
-
-    return utf8_encode($value);
+          //Clean up UBC's XML returns
+          $value = preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $value);
+          return utf8_encode($value);
+       }
 }
 
 function display_modal(){
-$output = '
-<!-- Modal -->
- <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <p style="font-weight:bold;" id="myModalLabel">Modal header</p>
-  </div>
-  <div class="modal-body">
-    <p>One fine body…</p>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>';
-return $output;
+       $output = '
+        <!-- Modal -->
+        <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <p style="font-weight:bold;" id="myModalLabel">Modal header</p>
+        </div>
+        <div class="modal-body">
+          <p>One fine body…</p>
+        </div>
+        <div class="modal-footer">
+        </div>
+        </div>';
+       return $output;
 }
 
 function show_dept_table($c_sessyr, $c_sesscd, $department, $course, $pills, $pillcount,$tabs, $tabcount) {
