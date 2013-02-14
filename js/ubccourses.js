@@ -1,13 +1,11 @@
-function getSectionData(sessyr,sesscd,department,course){
+function getSectionData(department,course){
           jQuery.ajax({
              url: ajaxurl,
              type: 'POST',
              data: {
                 action: 'ubcsections_display_ajax',
                 department: department,
-                course: course,
-                sessyr: sessyr,
-                sesscd: sesscd
+                course: course
              },
              error: function(jqXHR, textStatus) {
                 if (textStatus == 'timeout') {
@@ -24,5 +22,6 @@ function getSectionData(sessyr,sesscd,department,course){
              },
              timeout: 3000
           });
+     return false;
  }
 
