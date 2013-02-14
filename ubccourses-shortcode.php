@@ -148,12 +148,12 @@ class UBCCourses {
              "pillcount" => 4,
              "tabs" => false,
              "tabcount" => 4,
-             "parentPermalink" => ''
+             "parentpermalink" => ''
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $pillcount, $tabs, $tabcount, $parentPermalink);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $pillcount, $tabs, $tabcount, $parentpermalink);
 	}
 }
 
