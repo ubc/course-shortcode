@@ -26,7 +26,20 @@ class UBCCourses {
 		add_shortcode('ubccourses', array($this, 'shortcode'));
 	}
 	
-	private function getList($department, $course, $pills, $pillcount, $tabs, $tabcount){
+        private function getDetailsBtn($pageName,$parentPermalink){
+           $btnHTML = '';
+           $page = get_page_by_title($pageName);
+           if($page){
+              $pageLink = get_page_uri($page->ID);
+              if (dirname($pageLink) == $parentPermalink){
+                $btnHTML = '<a href="'.$pageLink.'" role="button" style="margin-left:5px;" class="btn btn-info btn-mini">Details</a>';
+              }
+           }
+           return $btnHTML;
+        }
+
+	
+	private function getList($department, $course, $pills, $pillcount, $tabs, $tabcount, $parentPermalink){
 		include_once 'ubcCalendarAPI.php';
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
@@ -36,14 +49,15 @@ class UBCCourses {
                    $fserver_label = '<button class="btn btn-mini btn-success status" type="button">from Transients</button>';
                 $count = 0;
                 foreach ($xml->course as $courses) { 
+                   $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentPermalink);
                    $params = "'".$department."', '".$courses['key']."' ";  
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
-                       $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
+                       $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p>'.$courses['descr'].'</p>';
                    }
                    else{
-                       $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.'</strong></p><p>'.$courses['descr'].'</p>';
+                       $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p>'.$courses['descr'].'</p>';
                 }
                 $count++;
               }
@@ -133,12 +147,13 @@ class UBCCourses {
              "pills" => false,
              "pillcount" => 4,
              "tabs" => false,
-             "tabcount" => 4
+             "tabcount" => 4,
+             "parentPermalink" => ''
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $pillcount, $tabs, $tabcount);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $pillcount, $tabs, $tabcount, $parentPermalink);
 	}
 }
 
