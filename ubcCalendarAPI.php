@@ -49,7 +49,7 @@ class ubcCalendarAPI {
           if (empty($this->XMLData)){          //If the transient does not exist 
              if ($this->get_file_contents_from_calendar()){  //return is true
                 $this->fromTransient = false;
-                set_transient($key,$this->XMLData,30);
+                set_transient($key,$this->XMLData,180);
              }
           }       
      }
