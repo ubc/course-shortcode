@@ -1,11 +1,12 @@
-function getSectionData(department,course){
+function getSectionData(department,course,profileslug){
           jQuery.ajax({
              url: ajaxurl,
              type: 'POST',
              data: {
                 action: 'ubcsections_display_ajax',
                 department: department,
-                course: course
+                course: course,
+                profileslug: profileslug
              },
              error: function(jqXHR, textStatus) {
                 if (textStatus == 'timeout') {

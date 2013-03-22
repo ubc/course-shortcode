@@ -4,6 +4,7 @@ class ubcCalendarAPI {
 
     private $urlBase = 'http://courses.students.ubc.ca/cs/servlets/SRVCourseSchedule?';
     var $XMLData = '';
+    var $profileData;
     var $fromTransient = true;
     var $dataURL = '';
     var $currentYear = '';
@@ -22,8 +23,64 @@ class ubcCalendarAPI {
            $this->getReq();
            $this->getDataURL();
            $this->getCalendarData();
+           $this->getProfileData();
      }
-	
+
+//###########MOD###########
+      private function getProfileData(){
+          //Set Unique key using department code
+          $key = 'ubccc_profiles'.md5($this->department);    //chk
+        
+          //Get transient value 
+          $profileDataSerialized = get_transient($key);      //chk
+
+          //If the transient does not exist 
+          if (empty($profileDataSerialized)){                //chk
+
+             //setup query set limit and type
+             query_posts("showposts=200&post_type=profile_cct");    
+  
+             // the loop
+             if (have_posts()) {                            //chk
+                 $count = 0;
+                 while (have_posts()){                      //chk
+                    the_post();                             //chk
+
+                    //Get meta data and create the data
+
+                    $custom_fields = get_post_custom($post->ID);                       //chk
+                    $profile_custom_field = $custom_fields['profile_cct'];             //chk
+                    $profiledataArray = maybe_unserialize($profile_custom_field[0]);   //chk
+
+                    //Create the dataArray
+                    $firstname = trim($profiledataArray['name']['first']);             //chk
+                    $lastname = trim($profiledataArray['name']['last']);               //chk
+                    $dataArray[$count] = $lastname.', '.$firstname;
+                    $count++;
+                  }
+             }
+             else{
+               $dataArray[0] = "no profiles";
+             }
+             wp_reset_query();                                       //chk
+
+             //serialize this before putting it back into transients
+             $profileDataSerialized = maybe_serialize($dataArray);   //chk
+
+             //set the transients and timeout
+             set_transient($key,$profileDataSerialized,180);          //chk
+
+             //set the class var
+             $this->profileData = $dataArray;                        //chk
+          }  
+          else{ //transient data exists!! Could be crap!!!
+
+             //set the class var
+             $this->profileData = maybe_unserialize($profileDataSerialized); //chk
+          }     
+     }
+//###########MOD###########
+
      private function getCurrentSession() {
        $currentMonth = date('n');
        if (($currentMonth > 5)&&($currentMonth < 9)) $this->currentSession = "S";  else  $this->currentSession = "W";

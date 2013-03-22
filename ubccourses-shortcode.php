@@ -31,7 +31,7 @@ class UBCCourses {
            $page = get_page_by_title($pageName);
            if($page){
               $pageLink = get_page_uri($page->ID);
-              if (dirname($pageLink) == $parentslug){
+              if (basename(dirname($pageLink)) == $parentslug){
                 $btnHTML = '<a href="'.$pageLink.'" role="button" style="margin-left:5px;" class="btn btn-info btn-mini">Details</a>';
               }
            }
@@ -39,8 +39,13 @@ class UBCCourses {
         }
 
 	
-	private function getList($department, $course, $pills, $pillcount, $tabs, $tabcount, $parentslug){
+	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug){
 		include_once 'ubcCalendarAPI.php';
+
+                //Need to validate parameters
+                if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
+                if (($opentab > $tabcount)||($opentab < 1)) $opentab = 1;
+
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
@@ -50,7 +55,8 @@ class UBCCourses {
                 $count = 0;
                 foreach ($xml->course as $courses) { 
                    $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
-                   $params = "'".$department."', '".$courses['key']."' ";  
+                   //$params = "'".$department."', '".$courses['key']."' "; 
+                   $params = "'".$department."','".$courses['key']."','".$profileslug."'"; 
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
@@ -64,21 +70,21 @@ class UBCCourses {
               if( $count == 0 )
                  $output = '<strong>Course(s) Not Found: Example [ubccourses department=ANTH] <br>(default is ALL courses add e.g. courses ="100A" for specific courses)</strong>';
               if (empty($course)&&($pills)||empty($course)&&($tabs)){
-                 $tabcount = 0;
+                 $tabnum = 0;
                  if ($pills)
                     $tabhead = '<ul class="nav nav-pills btn-mini" id="tabs" data-tabs="tabs">';
                  else
                     $tabhead = '<ul class="nav nav-tabs btn-mini" id="tabs" data-tabs="tabs">';
                  foreach ($coursetabs as $coursetab){
-                    $tabcount++;
-                    if ($tabcount <= $pillcount){
-                       if ($tabcount == 1){
-                           $tabhead .= '<li class="active"><a data-toggle="tab" href="#'.$department.$tabcount.'">'.$tabcount.'00 level courses</a></li>';
-                           $output .= '<div class="tab-pane active" id="'.$department.$tabcount.'">'.$coursetab.'</div>';
+                    $tabnum++;
+                    if ($tabnum <= $tabcount){
+                       if ($tabnum == $opentab){
+                           $tabhead .= '<li class="active"><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
+                           $output .= '<div class="tab-pane active" id="'.$department.$tabnum.'">'.$coursetab.'</div>';
                        }
                     else{
-                       $tabhead .= '<li><a data-toggle="tab" href="#'.$department.$tabcount.'">'.$tabcount.'00 level courses</a></li>';
-                       $output .= '<div class="tab-pane" id="'.$department.$tabcount.'">'.$coursetab.'</div>';
+                       $tabhead .= '<li><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
+                       $output .= '<div class="tab-pane" id="'.$department.$tabnum.'">'.$coursetab.'</div>';
                     }
                   }
                 }
@@ -92,12 +98,13 @@ class UBCCourses {
            //get post parameters    
            $department = $_POST['department'];
            $course = $_POST['course'];
+           $profileslug = $_POST['profileslug'];
            //return to js
-           echo $this->show_section_table($department,$course);  
+           echo $this->show_section_table($department,$course,$profileslug);  
            die();
         }
 
-        public function show_section_table($department,$course) {  
+        public function show_section_table($department,$course,$profileslug) {  
 		include_once 'ubcCalendarAPI.php';
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course, true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
@@ -107,6 +114,7 @@ class UBCCourses {
                    $fserver_label = '<i style="margin-left:4px;color:gray;" class="icon-calendar"></i>';
                 $count = 0; 
                 $output = '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>'; 
+                //$output .= '<td><strong>p</strong></td>';
                 foreach ($xml->section as $sections) {           
                    $ssc_link = "https://courses.students.ubc.ca/cs/main?"."pname=subjarea&tname=subjareas&req=5&dept=".$department."&course=".$course."&section=".$sections['key']."&sessyr=".$ubccalendarAPI->currentYear."&sesscd=".$ubccalendarAPI->currentSession;
                    $inst_link = "https://courses.students.ubc.ca/cs/main?pname=inst&ubcid=".$sections->instructors->instructor['ubcid'];
@@ -122,7 +130,16 @@ class UBCCourses {
 	                 array_push($bld,trim($meeting['buildingcd']));
                    }
                    $output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
-                   $output .= '<td><a target="_blank" href="'.$inst_link.'">'.$sections->instructors->instructor['name'].'</a></td></tr>';
+
+                   $profileHTML = ''; 
+                   $instructor_name = $sections->instructors->instructor['name'];
+                   if ($profileslug){
+                     $urlslugs = explode(', ',strtolower($instructor_name));
+                     $profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
+                     if (in_array(trim($instructor_name),$ubccalendarAPI->profileData))
+                       $profileHTML = '<td><a style="line-height:11px;" class="btn btn-mini btn-danger" href="'.$profile_url.'">profile<a></td>';
+                   }
+                   $output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML.'</tr>';
                    $count ++;
                  }
                  $output .= '</table>';
@@ -145,17 +162,17 @@ class UBCCourses {
              "department" => '',
              "course" => '',
              "pills" => false,
-             "pillcount" => 4,
              "tabs" => false,
              "tabcount" => 4,
-             "parentslug" => ''
+             "opentab" => 1,
+             "parentslug" => '',
+             "profileslug" => ''
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $pillcount, $tabs, $tabcount, $parentslug);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug);
 	}
 }
 
 $ubccourses = new UBCCourses;
-
