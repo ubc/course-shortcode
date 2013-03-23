@@ -10,14 +10,16 @@ class ubcCalendarAPI {
     var $currentYear = '';
     var $currentSession ='';
     var $isSection = false;
+    var $stickywinter = false;
     var $department = '';
     var $course = 0;
     var $req = 0;
 	
-     public function __construct($department,$course,$isSection){
+     public function __construct($department,$course,$stickywinter,$isSection){
            $this->department = $department;
            $this->course = $course;
            $this->isSection = $isSection;
+           $this->stickywinter = $stickywinter;
            $this->getCurrentSession();
            $this->getCurrentYear();
            $this->getReq();
@@ -82,8 +84,13 @@ class ubcCalendarAPI {
 //###########MOD###########
 
      private function getCurrentSession() {
-       $currentMonth = date('n');
-       if (($currentMonth > 5)&&($currentMonth < 9)) $this->currentSession = "S";  else  $this->currentSession = "W";
+       if ($this->stickywinter){
+         $this->currentSession = "W";
+       }
+       else{
+         $currentMonth = date('n');
+         if (($currentMonth > 5)&&($currentMonth < 9)) $this->currentSession = "S";  else  $this->currentSession = "W";
+       }
      }
 
      private function getCurrentYear() {

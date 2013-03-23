@@ -39,14 +39,14 @@ class UBCCourses {
         }
 
 	
-	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug){
+	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter){
 		include_once 'ubcCalendarAPI.php';
 
                 //Need to validate parameters
                 if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
                 if (($opentab > $tabcount)||($opentab < 1)) $opentab = 1;
 
-		$ubccalendarAPI = new ubcCalendarAPI($department, $course, false);
+		$ubccalendarAPI = new ubcCalendarAPI($department, $course, $stickywinter, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
@@ -56,7 +56,7 @@ class UBCCourses {
                 foreach ($xml->course as $courses) { 
                    $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
                    //$params = "'".$department."', '".$courses['key']."' "; 
-                   $params = "'".$department."','".$courses['key']."','".$profileslug."'"; 
+                   $params = "'".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."'"; 
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
@@ -99,14 +99,15 @@ class UBCCourses {
            $department = $_POST['department'];
            $course = $_POST['course'];
            $profileslug = $_POST['profileslug'];
+           $stickywinter = $_POST['stickywinter'];
            //return to js
-           echo $this->show_section_table($department,$course,$profileslug);  
+           echo $this->show_section_table($department,$course,$profileslug,$stickywinter);  
            die();
         }
 
-        public function show_section_table($department,$course,$profileslug) {  
+        public function show_section_table($department,$course,$profileslug,$stickywinter) {  
 		include_once 'ubcCalendarAPI.php';
-		$ubccalendarAPI = new ubcCalendarAPI($department, $course, true);
+		$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
@@ -166,12 +167,13 @@ class UBCCourses {
              "tabcount" => 4,
              "opentab" => 1,
              "parentslug" => '',
-             "profileslug" => ''
+             "profileslug" => '',
+             "stickywinter" => false
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter);
 	}
 }
 

@@ -1,4 +1,4 @@
-function getSectionData(department,course,profileslug){
+function getSectionData(department,course,profileslug,stickywinter){
           jQuery.ajax({
              url: ajaxurl,
              type: 'POST',
@@ -6,7 +6,8 @@ function getSectionData(department,course,profileslug){
                 action: 'ubcsections_display_ajax',
                 department: department,
                 course: course,
-                profileslug: profileslug
+                profileslug: profileslug,
+                stickywinter: stickywinter
              },
              error: function(jqXHR, textStatus) {
                 if (textStatus == 'timeout') {
@@ -25,4 +26,3 @@ function getSectionData(department,course,profileslug){
           });
      return false;
  }
-
