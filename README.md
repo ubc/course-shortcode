@@ -18,6 +18,8 @@ opentab - (default 1 - opens to a tab on page load)
 
 profileslug - (default "" - if entered will check if profile exists and links to it in the section listing)
 
+stick winter - (default false - if true will list winter courses when session changes to summer)
+
 Usage examples:
 
 [ubccourses department=ANTH course=201A]
