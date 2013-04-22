@@ -2,3 +2,6 @@
 .btn-mini{border-radius: 3px 3px 3px 3px;font-size:9px;padding: 0 3px;}
 .status{margin-left:4px;}
 table#ubccsections{font-size:10px !important;border-spacing:10px 0px !important;border-collapse:separate;}
+#instrstr span{font-weight:normal;font-size:smaller;margin-right:3px;}
+#instrstr{display:inline-block;margin-bottom:4px;color:#2f5d7c;}
+p.pdesc{margin-bottom:1px;}
