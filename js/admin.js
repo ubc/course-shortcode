@@ -125,7 +125,7 @@ function getDepartmentData(department){
                 department: department,
              },
              beforeSend: function(){
-	        alert('before send:'+JSParams.ajaxurl);
+	        //alert('before send:'+JSParams.ajaxurl);
              },
              dataType: 'html', 
              success: function(response){

@@ -451,8 +451,8 @@ class PluginTemplate {
            $course = $_POST['course'];
            //return to js
            $result = $this->enumerate_course($department,$course); 
-           if ($result.count == 0)
-             echo json_encode(array('data'=>$result));
+           //if ($result.count == 0)
+           echo json_encode(array('data'=>$result));
            die();
     }
 
@@ -572,7 +572,7 @@ class PluginTemplate {
                      }
                      else{ //New Instructor 
                          $instructorArr[trim($instructor_name)] = $department.$course;
-array_push($output,array('name'=>trim($instructor_name),'course'=>$department.$course));
+                         array_push($output,array('name'=>trim($instructor_name),  'course'=>$department.$course));
                      }
               }
            }

@@ -5,7 +5,7 @@
  * @since 1.0.0
  */
 
-div.instructor-list ul{padding:20px;}
+div.instructor-list ul{padding:20px;list-style-image:url('../images/listimage.jpg');}
 div.instructor-list li span{margin-left:3px;margin-right:3px;}
 div.instructor-list li{color:#333;opacity:0.5;text-decoration:line-through;}
 div.instructor-list li.active{opacity:1.0;text-decoration:none;}
