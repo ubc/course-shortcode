@@ -205,6 +205,7 @@ class PluginTemplate {
         $ajaxurl = admin_url('admin-ajax.php' );
         wp_enqueue_script( "{$this->namespace}-admin" );
         wp_enqueue_script( 'jquery-ui-progressbar');
+        wp_enqueue_script( 'jquery-ui-dialog');
         $params = array(
             'ajaxurl' => $ajaxurl
         );
@@ -228,7 +229,7 @@ class PluginTemplate {
      * Put code here that needs to happen when your plugin is deactivated
      */
     static function deactivate() {
-        delete_option($this->option_name);
+        delete_option('_ubccourses--options');
     }
     
     /**
@@ -457,7 +458,7 @@ class PluginTemplate {
     }
 
 	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors){
-		include_once 'ubcCalendarAPI.php';
+		//include_once 'ubcCalendarAPI.php';
 
                 //Need to validate parameters
                 if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
@@ -514,7 +515,7 @@ class PluginTemplate {
 	}
 
         public function show_section_table($department,$course,$profileslug,$stickywinter) {  
-		include_once 'ubcCalendarAPI.php';
+		//include_once 'ubcCalendarAPI.php';
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)

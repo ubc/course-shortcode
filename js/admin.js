@@ -54,6 +54,32 @@ jQuery(document).ready(function($){
        storeData(true); 
   });
 
+  $("#opens_ubccourses").click(function(e) {
+      e.preventDefault();       
+      $('#ubccoursesmodal').dialog({
+        modal: true,
+        closeText: "hide",
+        width: 400,
+        title: "[ubccourses] shortcode help.",
+        buttons: [ { text: "Ok", click: function() { $( this ).dialog( "close" ); } } ]
+      }).dialog("widget")
+      .next(".ui-widget-overlay")
+      .css("background", "#000000");
+  });
+
+  $("#opens_ubcinstructors").click(function(e) {
+      e.preventDefault();       
+      $('#ubcinstructorsmodal').dialog({
+        modal: true,
+        closeText: "hide",
+        width: 400,
+        title: "[ubcinstructors] shortcode help",
+        buttons: [ { text: "Ok", click: function() { $( this ).dialog( "close" ); } } ]
+      }).dialog("widget")
+      .next(".ui-widget-overlay")
+      .css("background", "#000000");
+  });
+
 });
 
 function getInstructorData(department,course){
