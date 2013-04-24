@@ -132,7 +132,8 @@ class ubcCalendarAPI {
                               return false;
                         }
                         else{ //Clean up UBC's XML returns
-                              $value = preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $value);
+                              //$value = preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $value);
+                               $value = preg_replace('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', '', $value);
                                $this->XMLData = utf8_encode($value);
                                return true;
                         }
