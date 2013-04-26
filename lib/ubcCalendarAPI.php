@@ -132,13 +132,45 @@ class ubcCalendarAPI {
                               return false;
                         }
                         else{ //Clean up UBC's XML returns
-                              //$value = preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $value);
-                               $value = preg_replace('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', '', $value);
+                               $value = preg_replace('/[\x80-\xFF]/', '', $value);
+                               $value = $this->stripInvalidXml($value);
                                $this->XMLData = utf8_encode($value);
                                return true;
                         }
                     }
       }
 
+/* @access public
+ * @param string $value
+ * @return string
+ */
+private function stripInvalidXml($value){
+    $ret = "";
+    $current;
+    if (empty($value)) 
+    {
+        return $ret;
+    }
+
+    $length = strlen($value);
+    for ($i=0; $i < $length; $i++)
+    {
+        $current = ord($value{$i});
+        if (($current == 0x9) ||
+            ($current == 0xA) ||
+            ($current == 0xD) ||
+            (($current >= 0x20) && ($current <= 0xD7FF)) ||
+            (($current >= 0xE000) && ($current <= 0xFFFD)) ||
+            (($current >= 0x10000) && ($current <= 0x10FFFF)))
+        {
+            $ret .= chr($current);
+        }
+        else
+        {
+            $ret .= " ";
+        }
+    }
+    return $ret;
+}
 
 }

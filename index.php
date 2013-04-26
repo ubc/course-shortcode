@@ -44,6 +44,10 @@ class PluginTemplate {
      * @uses PluginTemplate::wp_register_styles()
      */
     function __construct() {
+
+//error_reporting(E_ERROR | E_WARNING | E_PARSE);
+//ini_set('display_errors', 'On');
+
         // Name of the option_value to store plugin options in
         $this->option_name = '_' . $this->namespace . '--options';
 		
