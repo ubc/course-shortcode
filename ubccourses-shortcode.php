@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Include constants file
 require_once( dirname( __FILE__ ) . '/lib/constants.php' );
 
-class PluginTemplate {
+class UBC_Courses {
     var $namespace = "ubccourses";
     var $friendly_name = "UBC Courses";
     var $version = "1.0.0";
@@ -40,8 +40,8 @@ class PluginTemplate {
      * Instantiation construction
      * 
      * @uses add_action()
-     * @uses PluginTemplate::wp_register_scripts()
-     * @uses PluginTemplate::wp_register_styles()
+     * @uses UBC_Courses::wp_register_scripts()
+     * @uses UBC_Courses::wp_register_styles()
      */
     function __construct() {
 
@@ -52,7 +52,7 @@ class PluginTemplate {
         $this->option_name = '_' . $this->namespace . '--options';
 		
         // Load all library files used by this plugin
-        $libs = glob( PLUGINTEMPLATE_DIRNAME . '/lib/*.php' );
+        $libs = glob( UBC_COURSES_DIRNAME . '/lib/*.php' );
         foreach( $libs as $lib ) {
             include_once( $lib );
         }
@@ -75,9 +75,9 @@ class PluginTemplate {
         // Add a settings link next to the "Deactivate" link on the plugin listing page
         add_filter( 'plugin_action_links', array( &$this, 'plugin_action_links' ), 10, 2 );
         // Register front-end scripts for this plugin
-        wp_enqueue_script('{$this->namespace}-bootstrap', PLUGINTEMPLATE_URLPATH.'/js/bootstrap-modal.js',array('jquery'),'', true );
-        wp_enqueue_script('{$this->namespace}-shortcode', PLUGINTEMPLATE_URLPATH.'/js/ubccourses.js');
-        wp_enqueue_style('{$this->namespace}-shortstyle', PLUGINTEMPLATE_URLPATH.'/css/style.css');
+        
+        add_action('wp_enqueue_scripts', array( &$this, 'add_styles' ) );
+        
         
         // Register all JavaScripts for this plugin
         add_action( 'init', array( &$this, 'wp_register_scripts' ), 1 );
@@ -93,14 +93,23 @@ class PluginTemplate {
         add_action('wp_ajax_ubcdepartment_display_ajax',array(&$this, 'ubcdepartment_display_ajax'));
 
         // Add shortcodes
-	add_shortcode('ubccourses', array($this, 'courses_shortcode'));
-	add_shortcode('ubcinstructors', array($this, 'instructors_shortcode'));
+		add_shortcode('ubccourses', array($this, 'courses_shortcode'));
+		add_shortcode('ubcinstructors', array($this, 'instructors_shortcode'));
     }
     
     /**
+     * add_styles function.
+     * only add the style.css file on the front end side
+     * @access public
+     * @return void
+     */
+    public function add_styles(){
+    	wp_enqueue_style('{$this->namespace}-shortstyle', UBC_COURSES_URLPATH.'/css/style.css');
+    }
+    /**
      * Process update page form submissions
      * 
-     * @uses PluginTemplate::sanitize()
+     * @uses UBC_Courses::sanitize()
      * @uses wp_redirect()
      * @uses wp_verify_nonce()
      */
@@ -196,7 +205,7 @@ class PluginTemplate {
         $page_title = $this->friendly_name . ' Options';
         $namespace = $this->namespace;
         
-        include( PLUGINTEMPLATE_DIRNAME . "/views/options.php" );
+        include( UBC_COURSES_DIRNAME . "/views/options.php" );
     }
     
     /**
@@ -276,7 +285,17 @@ class PluginTemplate {
         return false;
     }
     
-
+	
+   /**
+    * get_courseInstructors function.
+    * 
+    * @access private
+    * @param mixed $option_name
+    * @param mixed $ubcCourse
+    * @param mixed $ubccalendarAPI
+    * @param mixed $profileslug
+    * @return void
+    */
    private function get_courseInstructors( $option_name, $ubcCourse, $ubccalendarAPI, $profileslug ) {
         if( !isset( $this->options ) || empty( $this->options ) ) {
             $this->options = get_option( $this->option_name, $this->defaults );
@@ -314,7 +333,19 @@ class PluginTemplate {
         }
         return false;
     }
-
+	
+    /**
+     * get_instructorCourses function.
+     * 
+     * @access private
+     * @param mixed $option_name
+     * @param mixed $profileName
+     * @param mixed $parentslug
+     * @param mixed $profileslug
+     * @param mixed $stickywinter
+     * @param mixed $instructors
+     * @return void
+     */
     private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors ) {
 
         //if profile name is empty AND your are on a profile AND singular page
@@ -360,10 +391,10 @@ class PluginTemplate {
      * etc. up for use.
      */
     static function instance() {
-        global $PluginTemplate;
+        global $UBC_Courses;
         
         // Only instantiate the Class if it hasn't been already
-        if( !isset( $PluginTemplate ) ) $PluginTemplate = new PluginTemplate();
+        if( !isset( $UBC_Courses ) ) $UBC_Courses = new UBC_Courses();
     }
 	
 	/**
@@ -376,7 +407,7 @@ class PluginTemplate {
 	 * @param string $file The name of the file being processed in the filter
 	 */
 	function plugin_action_links( $links, $file ) {
-		if( $file == plugin_basename( PLUGINTEMPLATE_DIRNAME . '/' . basename( __FILE__ ) ) ) {
+		if( $file == plugin_basename( UBC_COURSES_DIRNAME . '/' . basename( __FILE__ ) ) ) {
             $old_links = $links;
             $new_links = array(
                 "settings" => '<a href="options-general.php?page=' . $this->namespace . '">' . __( 'Settings' ) . '</a>'
@@ -393,7 +424,7 @@ class PluginTemplate {
      * This function will handling routing of form submissions to the appropriate
      * form processor.
      * 
-     * @uses PluginTemplate::_admin_options_update()
+     * @uses UBC_Courses::_admin_options_update()
      */
     function route() {
         $uri = $_SERVER['REQUEST_URI'];
@@ -460,7 +491,23 @@ class PluginTemplate {
            echo json_encode(array('data'=>$result));
            die();
     }
-
+	
+	/**
+	 * getList function.
+	 * 
+	 * @access private
+	 * @param mixed $department
+	 * @param mixed $course
+	 * @param mixed $pills
+	 * @param mixed $tabs
+	 * @param mixed $tabcount
+	 * @param mixed $parentslug
+	 * @param mixed $opentab
+	 * @param mixed $profileslug
+	 * @param mixed $stickywinter
+	 * @param mixed $instructors
+	 * @return void
+	 */
 	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors){
 		//include_once 'ubcCalendarAPI.php';
 
@@ -517,10 +564,20 @@ class PluginTemplate {
             }
             return $fserver_label.$output.$this->display_modal();
 	}
-
-        public function show_section_table($department,$course,$profileslug,$stickywinter) {  
-		//include_once 'ubcCalendarAPI.php';
-		$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,true);
+	
+    /**
+     * show_section_table function.
+     * 
+     * @access public
+     * @param mixed $department
+     * @param mixed $course
+     * @param mixed $profileslug
+     * @param mixed $stickywinter
+     * @return void
+     */
+    public function show_section_table($department,$course,$profileslug,$stickywinter) {  
+			//include_once 'ubcCalendarAPI.php';
+			$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
@@ -562,11 +619,19 @@ class PluginTemplate {
                  return $fserver_label.$output;
         }
 
-
-        public function enumerate_course($department,$course){
+	
+	/**
+	 * enumerate_course function.
+	 * 
+	 * @access public
+	 * @param mixed $department
+	 * @param mixed $course
+	 * @return void
+	 */
+	public function enumerate_course($department,$course){
            $instructorArr = array();
            $output = array();
-	   $subccalendarAPI = new ubcCalendarAPI($department, $course,true,true);
+	   	$subccalendarAPI = new ubcCalendarAPI($department, $course,true,true);
            $section_xml = simplexml_load_string($subccalendarAPI->XMLData);
            foreach ($section_xml->section as $sections) {           
               $instructor_name = $sections->instructors->instructor['name'];
@@ -583,9 +648,17 @@ class PluginTemplate {
            }
            return $output;
            die();
-        }
-
-        private function getDetailsBtn($pageName,$parentslug){
+	}
+	
+    /**
+     * getDetailsBtn function.
+     * 
+     * @access private
+     * @param mixed $pageName
+     * @param mixed $parentslug
+     * @return void
+     */
+    private function getDetailsBtn($pageName,$parentslug){
            $btnHTML = '';
            $page = get_page_by_title($pageName);
            if($page){
@@ -595,51 +668,76 @@ class PluginTemplate {
               }
            }
            return $btnHTML;
-        }
-
-        private function display_modal(){
-             $output = '<!-- Modal --><div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p style="font-weight:bold;" id="myModalLabel">Modal header</p></div><div class="modal-body"><p>One fine body…</p></div><div class="modal-footer"></div></div>';
-             return $output;
-        }
-
-	public function courses_shortcode($atts){
-             //Handle double call if Jetpack is installed
-             if (!in_the_loop()) return;
+     }
+	
+    /**
+     * display_modal function.
+     * 
+     * @access private
+     * @return void
+     */
+    private function display_modal(){
+         $output = '<!-- Modal --><div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p style="font-weight:bold;" id="myModalLabel">Modal header</p></div><div class="modal-body"><p>One fine body…</p></div><div class="modal-footer"></div></div>';
+         return $output;
+    }
+	
+	/**
+	 * courses_shortcode function.
+	 * 
+	 * @access public
+	 * @param mixed $atts
+	 * @return void
+	 */
+	public function courses_shortcode($atts) {
+             
+             // load the script
+             wp_enqueue_script( 'bootstrap-model', UBC_COURSES_URLPATH.'/js/bootstrap-modal.js',array('jquery'),'2.2.2', true );
+             wp_enqueue_script( 'ubc-courses', UBC_COURSES_URLPATH.'/js/ubccourses.js',array(),UBC_COURSES_VERSION, true );
              
              // Params and Defaults
              extract(shortcode_atts(array(
-             "department" => '',
-             "course" => '',
-             "pills" => false,
-             "tabs" => false,
-             "tabcount" => 4,
-             "opentab" => 1,
-             "parentslug" => '',
-             "profileslug" => '',
-             "instructors" => '',
-             "stickywinter" => false
+	             "department" => '',
+	             "course" => '',
+	             "pills" => false,
+	             "tabs" => false,
+	             "tabcount" => 4,
+	             "opentab" => 1,
+	             "parentslug" => '',
+	             "profileslug" => '',
+	             "instructors" => '',
+	             "stickywinter" => false
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
              return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors);
 	}
-
+	
+	/**
+	 * instructors_shortcode function.
+	 * 
+	 * @access public
+	 * @param mixed $atts
+	 * @return void
+	 */
 	public function instructors_shortcode($atts){
-             //Handle double call if Jetpack is installed
+             
+             wp_enqueue_script( 'bootstrap-model', UBC_COURSES_URLPATH.'/js/bootstrap-modal.js',array('jquery'),'2.2.2', true );
+             wp_enqueue_script( 'ubc-courses', UBC_COURSES_URLPATH.'/js/ubccourses.js',array(),UBC_COURSES_VERSION, true );
              
              // Params and Defaults
              extract(shortcode_atts(array(
-             "instructorname" => '',
-             "parentslug" => '',
-             "profileslug" => '',
-             "instructors" => false,
-             "stickywinter" => true
+	             "instructorname" => '',
+	             "parentslug" => '',
+	             "profileslug" => '',
+	             "instructors" => false,
+	             "stickywinter" => true
              ), $atts));
 	
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
              return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors);
+             
 	}
 
 
@@ -650,8 +748,8 @@ class PluginTemplate {
      */
     function wp_register_scripts() {
         // Admin JavaScript
-        wp_register_script( "{$this->namespace}-admin", PLUGINTEMPLATE_URLPATH . "/js/admin.js", array( 'jquery' ), $this->version, true );
-        wp_register_script( "{$this->namespace}-chosen", PLUGINTEMPLATE_URLPATH . "/js/chosen.jquery.min.js", array( 'jquery', ), $this->version, true );
+        wp_register_script( "{$this->namespace}-admin", UBC_COURSES_URLPATH . "/js/admin.js", array( 'jquery' ), $this->version, true );
+        wp_register_script( "{$this->namespace}-chosen", UBC_COURSES_URLPATH . "/js/chosen.jquery.min.js", array( 'jquery', ), $this->version, true );
     }
     
     /**
@@ -661,14 +759,14 @@ class PluginTemplate {
      */
     function wp_register_styles() {
         // Admin Stylesheet
-        wp_register_style( "{$this->namespace}-admin", PLUGINTEMPLATE_URLPATH . "/css/admin.css", array(), $this->version, 'screen' );
-        wp_register_style( "{$this->namespace}-chosen", PLUGINTEMPLATE_URLPATH . "/css/chosen.css", array(), $this->version, 'screen' );
-        wp_register_style( "{$this->namespace}-jqueryui", PLUGINTEMPLATE_URLPATH . "/css/jquery-ui.css", array(), $this->version, 'screen' );
+        wp_register_style( "{$this->namespace}-admin", UBC_COURSES_URLPATH . "/css/admin.css", array(), $this->version, 'screen' );
+        wp_register_style( "{$this->namespace}-chosen", UBC_COURSES_URLPATH . "/css/chosen.css", array(), $this->version, 'screen' );
+        wp_register_style( "{$this->namespace}-jqueryui", UBC_COURSES_URLPATH . "/css/jquery-ui.css", array(), $this->version, 'screen' );
     }
 }
-if( !isset( $PluginTemplate ) ) {
-	PluginTemplate::instance();
+if( !isset( $UBC_Courses ) ) {
+	UBC_Courses::instance();
 }
 
-register_activation_hook( __FILE__, array( 'PluginTemplate', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'PluginTemplate', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'UBC_Courses', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'UBC_Courses', 'deactivate' ) );
