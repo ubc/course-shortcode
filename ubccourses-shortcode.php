@@ -290,9 +290,12 @@ class UBC_Courses {
     * get_courseInstructors function.
     * 
     * @access private
-    * @param mixed $option_name
-    * @param mixed $ubcCourse
-    * @param mixed $ubccalendarAPI
+    * @param mixed $option_name
+
+    * @param mixed $ubcCourse
+
+    * @param mixed $ubccalendarAPI
+
     * @param mixed $profileslug
     * @return void
     */
@@ -323,7 +326,7 @@ class UBC_Courses {
                              $instrCount++;
                              $instID = trim(preg_replace('/[ ,]+/','', $instrName));
                              $instrCourseArray = explode(",",$instrPieces[1]);
-                             $htmlstr .= '<span id="iname">'.$profileHTML.'</span>';
+                             $htmlstr .= '<span id="iname"> '.$profileHTML.'</span>';
                      }
                  }
                  if ($instrCount > 0) $htmlstr = '<div id="instrstr"><span>Instructor(s): </span>'.$htmlstr.'</div>';
@@ -338,15 +341,20 @@ class UBC_Courses {
      * get_instructorCourses function.
      * 
      * @access private
-     * @param mixed $option_name
-     * @param mixed $profileName
-     * @param mixed $parentslug
-     * @param mixed $profileslug
-     * @param mixed $stickywinter
+     * @param mixed $option_name
+
+     * @param mixed $profileName
+
+     * @param mixed $parentslug
+
+     * @param mixed $profileslug
+
+     * @param mixed $stickywinter
+
      * @param mixed $instructors
      * @return void
      */
-    private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors ) {
+    private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear ) {
 
         //if profile name is empty AND your are on a profile AND singular page
         if ((empty($profileName))&&('profile_cct' == get_post_type($post->ID))&&(is_single())){
@@ -370,7 +378,7 @@ class UBC_Courses {
                              $instID = trim(preg_replace('/[ ,]+/','', $instrName));
                              $instrCourseArray = explode(",",$instrPieces[1]);
                              foreach ($instrCourseArray as $course) {
-                                 $htmlstr .= $this->getList( substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors);
+                                 $htmlstr .= $this->getList( substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear);
                              }
                              return $htmlstr;
                       }
@@ -457,8 +465,10 @@ class UBC_Courses {
            $course = $_POST['course'];
            $profileslug = $_POST['profileslug'];
            $stickywinter = $_POST['stickywinter'];
+           $stickyyear = false;
+           if($_POST['stickyyear'] === "true") $stickyyear = true;
            //return to js
-           echo $this->show_section_table($department,$course,$profileslug,$stickywinter);  
+           echo $this->show_section_table($department,$course,$profileslug,$stickywinter,$stickyyear);  
            die();
     }
 
@@ -466,9 +476,11 @@ class UBC_Courses {
     public function ubcdepartment_display_ajax () {
         $output = array();
         $department = $_POST['department'];
+        $stickyyear = false;
+        if($_POST['stickyyear'] === "true") $stickyyear = true;
         //validate in case
         if ((preg_match("/^[A-Z]*$/", $department))&&(strlen($department) < 5)) {
-	  $ubccalendarAPI = new ubcCalendarAPI($department, '', true, false);
+	  $ubccalendarAPI = new ubcCalendarAPI($department, '', true, $stickyyear, false);
           $xml = simplexml_load_string($ubccalendarAPI->XMLData);
           foreach ($xml->course as $courses) { 
             //create array of coursecodes to send to js
@@ -485,8 +497,10 @@ class UBC_Courses {
            //get post parameters    
            $department = $_POST['department'];
            $course = $_POST['course'];
+           $stickyyear = false;
+           if($_POST['stickyyear'] === "true") $stickyyear = true;
            //return to js
-           $result = $this->enumerate_course($department,$course); 
+           $result = $this->enumerate_course($department,$course,$stickyyear); 
            //if ($result.count == 0)
            echo json_encode(array('data'=>$result));
            die();
@@ -496,26 +510,35 @@ class UBC_Courses {
 	 * getList function.
 	 * 
 	 * @access private
-	 * @param mixed $department
-	 * @param mixed $course
-	 * @param mixed $pills
-	 * @param mixed $tabs
-	 * @param mixed $tabcount
-	 * @param mixed $parentslug
-	 * @param mixed $opentab
-	 * @param mixed $profileslug
-	 * @param mixed $stickywinter
+	 * @param mixed $department
+
+	 * @param mixed $course
+
+	 * @param mixed $pills
+
+	 * @param mixed $tabs
+
+	 * @param mixed $tabcount
+
+	 * @param mixed $parentslug
+
+	 * @param mixed $opentab
+
+	 * @param mixed $profileslug
+
+	 * @param mixed $stickywinter
+
 	 * @param mixed $instructors
 	 * @return void
 	 */
-	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors){
+	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear){
 		//include_once 'ubcCalendarAPI.php';
 
                 //Need to validate parameters
                 if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
                 if (($opentab > $tabcount)||($opentab < 1)) $opentab = 1;
 
-		$ubccalendarAPI = new ubcCalendarAPI($department, $course, $stickywinter, false);
+		$ubccalendarAPI = new ubcCalendarAPI($department, $course, $stickywinter,$stickyyear, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
@@ -528,7 +551,7 @@ class UBC_Courses {
                    }
                    $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
                    //$params = "'".$department."', '".$courses['key']."' "; 
-                   $params = "'".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."'"; 
+                   $params = "'".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."','".$stickyyear."'"; 
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
@@ -569,15 +592,18 @@ class UBC_Courses {
      * show_section_table function.
      * 
      * @access public
-     * @param mixed $department
-     * @param mixed $course
-     * @param mixed $profileslug
+     * @param mixed $department
+
+     * @param mixed $course
+
+     * @param mixed $profileslug
+
      * @param mixed $stickywinter
      * @return void
      */
-    public function show_section_table($department,$course,$profileslug,$stickywinter) {  
+    public function show_section_table($department,$course,$profileslug,$stickywinter,$stickyyear) {  
 			//include_once 'ubcCalendarAPI.php';
-			$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,true);
+			$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,$stickyyear,true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
@@ -624,14 +650,15 @@ class UBC_Courses {
 	 * enumerate_course function.
 	 * 
 	 * @access public
-	 * @param mixed $department
+	 * @param mixed $department
+
 	 * @param mixed $course
 	 * @return void
 	 */
-	public function enumerate_course($department,$course){
+	public function enumerate_course($department,$course,$stickyyear){
            $instructorArr = array();
            $output = array();
-	   	$subccalendarAPI = new ubcCalendarAPI($department, $course,true,true);
+	   $subccalendarAPI = new ubcCalendarAPI($department, $course,true,$stickyyear,true);
            $section_xml = simplexml_load_string($subccalendarAPI->XMLData);
            foreach ($section_xml->section as $sections) {           
               $instructor_name = $sections->instructors->instructor['name'];
@@ -654,7 +681,8 @@ class UBC_Courses {
      * getDetailsBtn function.
      * 
      * @access private
-     * @param mixed $pageName
+     * @param mixed $pageName
+
      * @param mixed $parentslug
      * @return void
      */
@@ -705,12 +733,13 @@ class UBC_Courses {
 	             "parentslug" => '',
 	             "profileslug" => '',
 	             "instructors" => '',
-	             "stickywinter" => false
+	             "stickywinter" => false,
+	             "stickyyear" => false
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors,$stickyyear);
 	}
 	
 	/**
@@ -731,12 +760,13 @@ class UBC_Courses {
 	             "parentslug" => '',
 	             "profileslug" => '',
 	             "instructors" => false,
-	             "stickywinter" => true
+	             "stickywinter" => true,
+	             "stickyyear" => false
              ), $atts));
 	
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors,$stickyyear);
              
 	}
 

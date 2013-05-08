@@ -82,14 +82,15 @@ jQuery(document).ready(function($){
 
 });
 
-function getInstructorData(department,course){
+function getInstructorData(department,course,stickyyear){
           jQuery.ajax({
              url: JSParams.ajaxurl,
              type: 'POST',
              data: {
                 action: 'ubcinstructors_display_ajax',
                 department: department,
-                course: course
+                course: course,
+                stickyyear: stickyyear
              },
              beforeSend: function(){
              },
@@ -135,7 +136,7 @@ function storeData(andSubmit){
 }
 
 
-function getDepartmentData(department){
+function getDepartmentData(department,stickyyear){
 
 //
 // Validate department code here!!!!!
@@ -149,6 +150,7 @@ function getDepartmentData(department){
              data: {
                 action: 'ubcdepartment_display_ajax',
                 department: department,
+                stickyyear: stickyyear,
              },
              beforeSend: function(){
 	        //alert('before send:'+JSParams.ajaxurl);
@@ -172,7 +174,7 @@ function getDepartmentData(department){
                 var obj = jQuery.parseJSON(response);
                 jQuery.each( obj.data, function( key, value ) {
                       numcourses++;
-                      getInstructorData(department,value.code);
+                      getInstructorData(department,value.code,stickyyear);
                 });
                 jQuery('div.instructor-list div#status').html('total courses: '+numcourses);
                }

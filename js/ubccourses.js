@@ -1,4 +1,4 @@
-function getSectionData(department,course,profileslug,stickywinter){
+function getSectionData(department,course,profileslug,stickywinter,stickyyear){
           jQuery.ajax({
              url: ajaxurl,
              type: 'POST',
@@ -7,7 +7,8 @@ function getSectionData(department,course,profileslug,stickywinter){
                 department: department,
                 course: course,
                 profileslug: profileslug,
-                stickywinter: stickywinter
+                stickywinter: stickywinter,
+                stickyyear:stickyyear,
              },
              error: function(jqXHR, textStatus) {
                 if (textStatus == 'timeout') {

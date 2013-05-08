@@ -45,6 +45,7 @@
 <li><strong>opentab</strong> - default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill</li>
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
+<li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
 <li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).</li>
 </ul>
 </div>
@@ -58,6 +59,7 @@
 <li><strong>parentslug</strong> - if entered, any page title (of the form e.g. “ANTH201A” that matches and has a parent page equal to the slug will be linked to from the course list with a “Details” button</li>
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
+<li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
 <li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).</li>
 </ul>
 
@@ -80,10 +82,11 @@
 </select>
 
 <div class="btn-group" style="display:inline-block;">
-   <button class="button-primary" style="border-radius:4px;margin-right:4px;" onclick="param = document.getElementById('department').value.toUpperCase();getDepartmentData(param)">Get Instructors</button>
+   <button class="button-primary" style="border-radius:4px;margin-right:4px;" onclick="sticky=false;if (stickyyear.checked == 1) sticky = true;param = document.getElementById('department').value.toUpperCase();getDepartmentData(param,sticky)">Get Instructors</button>
    <button id="clearBtn" class="button-primary" style="border-radius:4px;margin-right:4px;" >Clear</button>
    <button id="revertBtn" class="button-primary" style="border-radius:4px;margin-right:4px;" >Revert</button>
    <button id="saveBtn" class="button-primary" style="display:none;border-radius:4px;margin-right:4px;" >Save Changes</button>
+   <input type="checkbox" id="stickyyear" name="stickyyear" value="1">stickyyear?<br>
 </div>
 <div class='instructor-list'><div id='status'></div><ul><?php echo $this->get_option( 'option_2',true );?></ul></div>
 </div>
