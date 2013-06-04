@@ -4,7 +4,7 @@ Plugin Name: UBC Courses
 Plugin URI: https://github.com/ubc/course-shortcode
 Description: Allows the listing of UBC courses and sections with data from the UBC calendar.
 Version: 1.0.0
-Author: Michael Ha (CTLT) and Shaffiq Rahemtulla (ArtsISIT)
+Author: Michael Ha/Enej Bajgoric/Shaffiq Rahemtulla/Navid Fattahi
 Author URI: http://isit.arts.ubc.ca
 License: GPL3
 
@@ -534,9 +534,16 @@ class UBC_Courses {
 	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear){
 		//include_once 'ubcCalendarAPI.php';
 
-                //Need to validate parameters
-                if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
-                if (($opentab > $tabcount)||($opentab < 1)) $opentab = 1;
+		//Need to validate parameters
+		// if input to tabcount is not one of the special commands (g,u, n*) ...
+		if (strcasecmp($tabcount, 'g') != 0 && strcasecmp($tabcount, 'u') != 0 && strcasecmp(substr($tabcount,0,1), 'n') != 0){
+		  if (($tabcount > 6)||($tabcount < 1)) $tabcount = 4;
+		  if (($opentab > $tabcount)||($opentab < 1)) $opentab = 1;
+		}
+		// if input to tabcount is the special commands n* ...
+		elseif (strcasecmp(substr($tabcount,0,1), 'n') == 0){
+		  if ((intval(substr($tabcount,1,2)) > 6)||(intval(substr($tabcount,1,2)) < 1)) $tabcount = "n1";
+		}
 
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course, $stickywinter,$stickyyear, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
@@ -544,7 +551,17 @@ class UBC_Courses {
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
                 else
                    $fserver_label = '<i style="margin-left:4px;color:gray;" class="icon-calendar"></i>';
+				
+				// Put current sessions's label
+				$ubccalendarAPI->getCurrentSession();
+				$ubccalendarAPI->getCurrentYear;		
+				if ($ubccalendarAPI->currentSession == "W")
+					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
+				else
+					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
+				
                 $count = 0;
+				$offset = 1;
                 foreach ($xml->course as $courses) { 
                    if ($instructors){
                        $instrstr = $this->get_courseInstructors('option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
@@ -559,27 +576,49 @@ class UBC_Courses {
                    }
                    else{
                        $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr;
+                   }
+                   $count++;
                 }
-                $count++;
-              }
               if( $count == 0 )
-                 $output = '<strong>Course(s) Not Found: Example [ubccourses department=ANTH] <br>(default is ALL courses add e.g. courses ="100A" for specific courses)</strong>';
+                 $output = '<br/><strong>No '.$department.' course(s) were found for '.$ubccalendarAPI->currentSession.$ubccalendarAPI->currentYear.' term.</strong>';
               if (empty($course)&&($pills)||empty($course)&&($tabs)){
                  $tabnum = 0;
                  if ($pills)
                     $tabhead = '<ul class="nav nav-pills btn-mini" id="tabs" data-tabs="tabs">';
                  else
                     $tabhead = '<ul class="nav nav-tabs btn-mini" id="tabs" data-tabs="tabs">';
-                 foreach ($coursetabs as $coursetab){
+				
+				 // if tabcount is 'g' or 'G', show tabs 500 and 600 only
+				 if (strcasecmp($tabcount, 'g') == 0){
+					$tabnum = 4;
+					$opentab = 5;
+					$tabcount = 6;
+					$offset = 5;
+				 }
+				 // if tabcount is 'u' or 'U', show tabs 100 through 400
+				 elseif (strcasecmp($tabcount, 'u') == 0){
+					$tabnum = 0;
+					$opentab = 1;
+					$tabcount = 4;
+				 }
+				 // if tabcount is 'n*' or 'N*', show tab *00 only (eg: n2 -> only 200 tab is displayed)
+				 else if (strcasecmp(substr($tabcount,0,1), 'n') == 0){
+				    $opentab = intval(substr($tabcount,1,2));
+					$tabnum = $opentab - 1;
+					$tabcount = $opentab;
+					$offset = $opentab;
+				 }
+				 
+				 for(; $offset <= count($coursetabs); $offset++) {
                     $tabnum++;
                     if ($tabnum <= $tabcount){
                        if ($tabnum == $opentab){
                            $tabhead .= '<li class="active"><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
-                           $output .= '<div class="tab-pane active" id="'.$department.$tabnum.'">'.$coursetab.'</div>';
+                           $output .= '<div class="tab-pane active" id="'.$department.$tabnum.'">'.$coursetabs[$offset].'</div>';
                        }
                     else{
                        $tabhead .= '<li><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
-                       $output .= '<div class="tab-pane" id="'.$department.$tabnum.'">'.$coursetab.'</div>';
+                       $output .= '<div class="tab-pane" id="'.$department.$tabnum.'">'.$coursetabs[$offset].'</div>';
                     }
                   }
                 }
@@ -609,10 +648,18 @@ class UBC_Courses {
                    $fserver_label = '<i style="margin-left:4px;color:#dfdfdf;" class="icon-calendar"></i>';
                 else
                    $fserver_label = '<i style="margin-left:4px;color:gray;" class="icon-calendar"></i>';
+				
+				$ubccalendarAPI->getCurrentSession();
+				$ubccalendarAPI->getCurrentYear;		
+				if ($ubccalendarAPI->currentSession == "W")
+					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
+				else
+					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
+					
                 $count = 0; 
                 $output = '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>'; 
                 //$output .= '<td><strong>p</strong></td>';
-                foreach ($xml->section as $sections) {           
+                foreach ($xml->section as $sections) {
                    $ssc_link = "https://courses.students.ubc.ca/cs/main?"."pname=subjarea&tname=subjareas&req=5&dept=".$department."&course=".$course."&section=".$sections['key']."&sessyr=".$ubccalendarAPI->currentYear."&sesscd=".$ubccalendarAPI->currentSession;
                    $inst_link = "https://courses.students.ubc.ca/cs/main?pname=inst&ubcid=".$sections->instructors->instructor['ubcid'];
                    $output .= '<tr><td><a target="_blank" href="'.$ssc_link.'">'.$sections['key'].'</a></td><td>'.$sections['activity'].'</td>';

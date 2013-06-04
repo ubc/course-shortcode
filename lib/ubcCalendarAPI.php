@@ -85,7 +85,7 @@ class ubcCalendarAPI {
      }
 //###########MOD###########
 
-     private function getCurrentSession() {
+     function getCurrentSession() {
        if ($this->stickywinter){
          $this->currentSession = "W";
        }
@@ -98,7 +98,7 @@ class ubcCalendarAPI {
          }
        }
        }
-     private function getCurrentYear() {
+     function getCurrentYear() {
        $currentYear = date('Y');  $currentMonth = date('n');
        if (( $this->currentSession == "W" ) && ($currentMonth > 0) && (!$this->stickyyear))
               $this -> currentYear = $currentYear-1; 

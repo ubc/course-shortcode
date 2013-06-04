@@ -40,7 +40,7 @@
 <li><strong>course</strong> - if department filled and course empty then you get all departmental courses listed for the session</li>
 <li><strong>tabs</strong> - default false – if true, the data is setup with tabs for each year level of courses.</li>
 <li><strong>pills</strong> - if true, the data is setup with pills instead of tabs</li>
-<li><strong>tabcount</strong> - default 4 – if set, the data is truncated  at the year level of courses</li>
+<li><strong>tabcount</strong> - default 4 – if set, the data is truncated at the year level of courses. If set to 'u', levels 100 through 400 are displayed. If set to 'g', levels 500 and 600 are displayed. To display courses for a single year level, use 'n*' (e.g. n3 shows 300 level courses only)</li>
 <li><strong>parentslug</strong> - if entered, any page title (of the form e.g. “ANTH201A” that matches and has a parent equal to the slug will be linked to from the course list with a “Details” button</li>
 <li><strong>opentab</strong> - default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill</li>
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
@@ -51,7 +51,7 @@
 </div>
 
 <div id="ubcinstructorsmodal">
-<p>In its basic form the [ubccourses instructorname="lastname, firstname"] shortcode allows the listing of UBC courses that the instructor teaches in the current session. The instructor name has to match exactly (no fuzzy matching in this version) with the name in the UBC Calendar. Some of the allowed parameters are as below:</p> 
+<p>In its basic form the [ubcinstructors instructorname="lastname, firstname"] shortcode allows the listing of UBC courses that the instructor teaches in the current session. The instructor name has to match exactly (no fuzzy matching in this version) with the name in the UBC Calendar. Some of the allowed parameters are as below:</p> 
 
 
 <ul>
