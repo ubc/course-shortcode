@@ -608,17 +608,17 @@ class UBC_Courses {
 					$tabcount = $opentab;
 					$offset = $opentab;
 				 }
-				 
+				 $tab_id = md5(uniqid());
 				 for(; $offset <= count($coursetabs); $offset++) {
                     $tabnum++;
                     if ($tabnum <= $tabcount){
                        if ($tabnum == $opentab){
-                           $tabhead .= '<li class="active"><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
-                           $output .= '<div class="tab-pane active" id="'.$department.$tabnum.'">'.$coursetabs[$offset].'</div>';
+                           $tabhead .= '<li class="active"><a data-toggle="tab" href="#'.$department.$tabnum.$tab_id.'">'.$tabnum.'00 level courses</a></li>';
+                           $output .= '<div class="tab-pane active" id="'.$department.$tabnum.$tab_id.'">'.$coursetabs[$offset].'</div>';
                        }
                     else{
-                       $tabhead .= '<li><a data-toggle="tab" href="#'.$department.$tabnum.'">'.$tabnum.'00 level courses</a></li>';
-                       $output .= '<div class="tab-pane" id="'.$department.$tabnum.'">'.$coursetabs[$offset].'</div>';
+                       $tabhead .= '<li><a data-toggle="tab" href="#'.$department.$tabnum.$tab_id.'">'.$tabnum.'00 level courses</a></li>';
+                       $output .= '<div class="tab-pane" id="'.$department.$tabnum.$tab_id.'">'.$coursetabs[$offset].'</div>';
                     }
                   }
                 }
