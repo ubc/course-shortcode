@@ -1,4 +1,5 @@
 <script type="text/javascript">var __namespace = '<?php echo $namespace; ?>';</script>
+
 <div class="wrap" style="padding:20px;">
 
 
@@ -14,19 +15,17 @@
        }
       ?> 
 
-
-
-<style>  .progress-label {float: left;text-shadow: 1px 1px 0 #fff;}</style>
-
 <h4>A simple OOP WordPress plugin that allows the listing of UBC courses, sections and instructors with data from the UBC calendar.</h4>
 
 <p>In order to collect instructors from a particular course code, please choose the course code from the drop down selection list and click the "Get Instructors" button. Once the operation is complete, click the "Save Changes" button.</p>
 
-<p>To delete instructors from the list, click on the instructor name (the list item should fade) and click on "Save Changes".</p>
+<p>To delete instructors from the list, click on the red delete button (the list item should fade) and click on "Save Changes".</p>
 
 <p>If you make a mistake in deleting or click once too many, do not panic - just click "Clear" and then "Save Changes" and begin again - Remember the data is just being gathered from UBC Calendar and is being cached so, you are not calling the remote Calendar server over and over again. </p>
 
-<i>Hint: For instructors in multiple disciplines, select course code and click the "Get Instructors" button again. Continue to build the list of instructors to suit your website.</i>
+<i>Hint: For instructors in multiple disciplines, select course code and click the "Get Instructors" button again. Continue to build the list of instructors to suit your website.</i><br><br>
+
+<i>Hint: For instructors that wish to use a different name than that which appears in the calendar, double-click on the name in the list, type in the preferred name, click change and make sure to save the changes - note: these name changes are NOT persistent and will need to be re-done if the instructor is removed from the list and is brought in again.</i>
 
 <style>#ubcinstructorsmodal,#ubccoursesmodal{display:none;} .ui-widget-header .ui-icon{} </style>
 
@@ -40,13 +39,14 @@
 <li><strong>course</strong> - if department filled and course empty then you get all departmental courses listed for the session</li>
 <li><strong>tabs</strong> - default false – if true, the data is setup with tabs for each year level of courses.</li>
 <li><strong>pills</strong> - if true, the data is setup with pills instead of tabs</li>
-<li><strong>tabcount</strong> - default 4 – if set, the data is truncated at the year level of courses. If set to 'u', levels 100 through 400 are displayed. If set to 'g', levels 500 and 600 are displayed. To display courses for a single year level, use 'n*' (e.g. n3 shows 300 level courses only)</li>
+<li><strong>tabcount</strong> - default 4 – if set, the data is truncated at the year level of courses. If set to 'u', levels 100 through 400 are displayed. If set to 'g', levels 500 and 600 are displayed. To display courses for a single year level, use 'n*' (e.g. n3 shows 300 level courses only). Note: tabcount parameter can be used without tabs or pills as a list filter.</li>
 <li><strong>parentslug</strong> - if entered, any page title (of the form e.g. “ANTH201A” that matches and has a parent equal to the slug will be linked to from the course list with a “Details” button</li>
+<li><strong>desc_category</strong> - the category slug - if entered, any post title (of the form e.g. “ANTH201A” that has the category equal to the slug will shown in an accordion format below the calendar description with the accordion header being set to the category name (not slug).</li>
 <li><strong>opentab</strong> - default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill</li>
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
 <li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
-<li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).</li>
+<li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).<i> Note: If the calendar name differs from the profile name, the cross match can be made on the plugin admin page by double clicking the instructor name on the list and setting it to be the same as the profile name.</i></li>
 </ul>
 </div>
 
@@ -60,7 +60,7 @@
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
 <li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
-<li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).</li>
+<li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them). <i>Note: If the calendar name differs from the profile name, the cross match can be made on the plugin admin page by double clicking the instructor name on the list and setting it to be the same as the profile name.</i></li>
 </ul>
 
 <i>**If used without the instructorname parameter and on a profile singular page, will show courses taught by that instructor. <i>Hint: Can be placed in "if empty" container in a profile field</i>.

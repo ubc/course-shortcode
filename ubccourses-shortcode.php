@@ -264,10 +264,14 @@ class UBC_Courses {
               foreach ($instrArray as $instrData) {
                  $instrPieces = explode("*", $instrData);
                  $instrName = trim($instrPieces[0]);
+                 if (count($instrPieces) == 2) 
+                   $cinstrName = trim($instrPieces[0]);
+                 else
+                   $cinstrName = trim($instrPieces[2]);
                  if (!empty($instrName)){
-                    $instID = trim(preg_replace('/[ ,]+/','', $instrName));
+                    $instID = trim(preg_replace('/[ ,]+/','', $cinstrName));
                     $instrCourseArray = explode(",",$instrPieces[1]);
-                    $htmlstr .= '<li onclick="update(this);" class="active '.$instID.'"><span id="iname">'.trim($instrName).'</span>';
+                    $htmlstr .= '<li  class="active '.$instID.'" title="'.trim($cinstrName).'"><span class="delbtn" onclick="update(this.parentNode);"></span><span id="iname" class="editable">'.trim($instrName).'</span>';
                     foreach ($instrCourseArray as $course) {
                       $htmlstr .= '<span class="icourse '.$course.'">'.$course.'</span>';
                     }
@@ -354,7 +358,7 @@ class UBC_Courses {
      * @param mixed $instructors
      * @return void
      */
-    private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear ) {
+    private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear, $desc_category ) {
 
         //if profile name is empty AND your are on a profile AND singular page
         if ((empty($profileName))&&('profile_cct' == get_post_type($post->ID))&&(is_single())){
@@ -378,7 +382,7 @@ class UBC_Courses {
                              $instID = trim(preg_replace('/[ ,]+/','', $instrName));
                              $instrCourseArray = explode(",",$instrPieces[1]);
                              foreach ($instrCourseArray as $course) {
-                                 $htmlstr .= $this->getList( substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear);
+                                 $htmlstr .= $this->getList( substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
                              }
                              return $htmlstr;
                       }
@@ -529,9 +533,13 @@ class UBC_Courses {
 	 * @param mixed $stickywinter
 
 	 * @param mixed $instructors
+	 
+	 * @param mixed $stickyyear
+	 
+	 * @param mixed $desc_category
 	 * @return void
 	 */
-	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear){
+	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear, $desc_category){
 		//include_once 'ubcCalendarAPI.php';
 
 		//Need to validate parameters
@@ -567,15 +575,34 @@ class UBC_Courses {
                        $instrstr = $this->get_courseInstructors('option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
                    }
                    $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
+				   
+				   $descaccordion = $this->getDescAccordion($department.$courses['key'],$desc_category);
+				   
                    //$params = "'".$department."', '".$courses['key']."' "; 
                    $params = "'".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."','".$stickyyear."'"; 
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
-                       $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr;
+                       $coursetabs[$cindex] .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
                    }
-                   else{
-                       $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr;
+                   else{	// if tabs or pills are not enabled, we still want to make "tabcount" accessible to user
+						$cindex = substr($courses['key'], 0, 1);
+						// if tabcount is 'g' or 'G', show tabs 500 and 600 only
+						if (strcasecmp($tabcount, 'g') == 0){
+							if ($cindex == 5 || cindex == 6)
+								$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
+						}
+						// if tabcount is 'u' or 'U', show tabs 100 through 400
+						elseif (strcasecmp($tabcount, 'u') == 0){
+							if ($cindex == 1 || $cindex == 2 || $cindex == 3 || $cindex == 4)
+								$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
+						}
+						// if tabcount is 'n*' or 'N*', show tab *00 only (eg: n2 -> only 200 tab is displayed)
+						else if (strcasecmp(substr($tabcount,0,1), 'n') == 0){
+							if ($cindex == intval(substr($tabcount,1,2)))
+								$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
+						}
+                       //$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
                    }
                    $count++;
                 }
@@ -751,6 +778,68 @@ class UBC_Courses {
      * @access private
      * @return void
      */
+	 
+    /**
+     * getDescAccordion function.
+     * 
+     * @access private
+     * @param mixed $postName
+
+     * @param mixed $desc_category
+     * @return void
+     */
+    private function getDescAccordion($postName,$desc_category){
+			$divHTML = '';
+			
+			if (get_category_by_slug( $desc_category ) == 0)
+				return $divHTML;
+
+            $cat_obj = get_category_by_slug( $desc_category );
+            $cat_id = $cat_obj->term_id;
+            $cat_name = get_cat_name( $cat_id );
+			
+			$args=array(
+			  'post_type' => 'post',
+			  'name' => $postName,
+			  'posts_per_page' => 1
+			);
+			
+			$postlist = get_posts($args);
+			$post_cats = get_the_category($postlist[0]->ID);
+                        
+			$filtered_post;
+			
+			foreach(($post_cats) as $category) {
+                if ($category->cat_ID == $cat_id)
+					$filtered_post = $postlist[0];
+			} 
+			
+		   if($filtered_post){
+				$acrdn_ID = rand(0, 999);	//generate accordions with random ID's
+				$divHTML = $divHTML.'<div class="accordion" id="accordion'.$acrdn_ID.'"><div class="accordion-group"><div class="accordion-heading">
+				<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion'.$acrdn_ID.'" href="#collapse'.$acrdn_ID.'">'.$cat_name.'</a></div>
+				<div id="collapse'.$acrdn_ID.'" class="accordion-body collapse"><div class="accordion-inner">';
+				if ($postlist[0]->post_excerpt)
+				{
+					$divHTML = $divHTML.$postlist[0]->post_excerpt.'<br/><a href="'.$postlist[0]->guid.'">Read More...</a></div></div></div></div>';
+				}
+				else	// if excerpt is empty...
+				{
+					// clean up the HTML
+					$post_content = strip_tags ( $postlist[0]->post_content , '<a><p><strong><br/><br><b>' );
+					// strip out the first 150 words
+					$phrase_array = explode(' ',$post_content);
+					if(count($phrase_array) > 150)
+						$post_content = implode(' ',array_slice($phrase_array, 0, 150)).'...';
+					// put it inside the generated accordion
+					$divHTML = $divHTML.$post_content.'<br/><a href="'.$postlist[0]->guid.'">Read More...</a></div></div></div></div>';
+				}	
+		   }
+		   
+           return $divHTML;
+     }	 
+	 
+	 
     private function display_modal(){
          $output = '<!-- Modal --><div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p style="font-weight:bold;" id="myModalLabel">Modal header</p></div><div class="modal-body"><p>One fine body…</p></div><div class="modal-footer"></div></div>';
          return $output;
@@ -781,12 +870,13 @@ class UBC_Courses {
 	             "profileslug" => '',
 	             "instructors" => '',
 	             "stickywinter" => false,
-	             "stickyyear" => false
+	             "stickyyear" => false,
+				 "desc_category" => ''
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors,$stickyyear);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
 	}
 	
 	/**

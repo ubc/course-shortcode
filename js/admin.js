@@ -32,6 +32,30 @@ var currentcount;
            jQuery("#saveBtn").fadeOut('slow');
   }
 
+jQuery(document).ready(function(jQuery) {doedit();}); 
+
+function doedit(){
+jQuery(".editable").live({mouseenter:function(){jQuery(this).addClass("editHover");},mouseleave:function(){jQuery(this).removeClass("editHover");}});jQuery(".editable").live("dblclick", replaceHTML);jQuery(".btnSave, .btnDiscard").live("click", handler);
+function handler(){
+  var selector="";
+  if (jQuery(this).hasClass("btnSave")){ 
+    selector = "editBox";
+    var inputText = jQuery(this).siblings("form").children("."+selector).val();
+    inputText = inputText.replace(/(<([^>]+)>)/ig, '');
+ jQuery(this).parent().html(inputText).removeClass("noPad editHover").live("dblclick", replaceHTML);
+    jQuery("#saveBtn").fadeIn('slow');
+  }
+  else{  
+    selector = "buffer";
+    jQuery(this).parent().html(jQuery(this).parent().parent().attr("title")).removeClass("noPad editHover").live("dblclick", replaceHTML);
+    jQuery("#saveBtn").fadeIn('slow');
+  }
+  return false;
+} 
+function replaceHTML(){var buffer = jQuery(this).html().replace(/"/g, "&quot;");buffer = buffer.replace(/</gi, "");buffer = buffer.replace(/>/gi, "");jQuery(this).addClass("noPad").html("").html("<form class=\"editor\"><input type=\"text\" name=\"value\" class=\"editBox\" 				value=\"" + buffer + "\" /> <input type=\"hidden\" name=\"buffer\" class=\"buffer\" value=\"" + buffer + "\" /><input type=\"hidden\" name=\"field\" class=\"record\" value=\"" + jQuery(this).attr("id") + "\" /></form><a href=\"#\" class=\"btnSave\">Change</a> <a href=\"#\" class=\"btnDiscard\">Revert to Orig.</a>").unbind('dblclick', replaceHTML);}
+}
+
+
 jQuery(document).ready(function($){
 
   $(document).on('submit', 'form.settings-form' ,function () {
@@ -105,7 +129,7 @@ function getInstructorData(department,course,stickyyear){
                    var instrid = jQuery.trim(value.name.replace(/[\s,.]/g, ''));
                    var courseid = jQuery.trim(value.course);
                    if (jQuery("li." + instrid).length == 0) {
-                      jQuery('div.instructor-list ul').append('<li onclick="update(this);" class="active '+instrid+'"><span id="iname">'+value.name+'</span><span class="icourse '+courseid+'"> '+value.course+'</span></li>');
+                      jQuery('div.instructor-list ul').append('<li  class="active '+instrid+'" title="'+value.name+'"><span class="delbtn" onclick="update(this.parentNode);"></span><span id="iname" class="editable">'+value.name+'</span><span class="icourse '+courseid+'"> '+value.course+'</span></li>');
                    }
                    else{  //instructor exists - check if course code exists
                       if (jQuery("li." + instrid + " span." + courseid).length == 0) {
@@ -128,7 +152,8 @@ function storeData(andSubmit){
      jQuery(this).find(".icourse").each( function(index) {
        dataString += jQuery.trim(jQuery(this).text()) + ',';
      });
-     dataString = dataString.replace(/,$/,':');
+     dataString = dataString.replace(/,$/,'*');
+     dataString += jQuery.trim(jQuery(this).attr("title")) + ':';
   });
   dataString = dataString.replace(/:$/,'');
   jQuery("input#instructordata").val(dataString);
