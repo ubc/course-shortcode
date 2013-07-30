@@ -602,7 +602,9 @@ class UBC_Courses {
 							if ($cindex == intval(substr($tabcount,1,2)))
 								$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
 						}
-                       //$output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
+                                             else{
+                       $output .= '<p><strong>'.$department.$courses['key'].' '.$courses['title'].' '.$section.$detailsbtn.'</strong></p><p class="pdesc">'.$courses['descr'].'</p>'.$instrstr.$descaccordion;
+                                             }
                    }
                    $count++;
                 }
