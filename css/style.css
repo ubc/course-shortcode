@@ -11,20 +11,20 @@ form{display:inline-block;}*/
 .btnSave, .btnDiscard{padding:6px 0 4px 4px;}
 .progress-label{float:left;text-shadow:1px 1px 0 #fff;}
 
-.accordion {margin-bottom:5px;}
-.accordion .accordion-group{border:none;}
-.accordion .accordion-heading a:focus{outline:none;}
-.accordion .accordion-heading a:hover, #acc .accordion-heading a:active{color:#002145;font-weight:bold;background:none;}
-.accordion .accordion-toggle{padding: 8px 0;}
-.accordion .accordion-group .collapse.in{background-color:#EFEFEF;border:1px dotted #333333;padding:10px 10px 15px;}
-.accordion .accordion-toggle.collapsed:after {
+.coursesacc {margin-bottom:5px;}
+.coursesacc .accordion-group{border:none;}
+.coursesacc .accordion-heading a:focus{outline:none;}
+.coursesacc .accordion-heading a:hover, #acc .accordion-heading a:active{color:#002145;font-weight:bold;background:none;}
+.coursesacc .accordion-toggle{padding: 8px 0;}
+.coursesacc .accordion-group .collapse.in{background-color:#EFEFEF;border:1px dotted #333333;padding:10px 10px 15px;}
+.coursesacc .accordion-toggle.collapsed:after {
     content: " \f055";
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
     text-decoration: inherit;
 }
-.accordion .accordion-toggle:after {
+.coursesacc .accordion-toggle:after {
     content: " \f056";
     font-family: FontAwesome;
     font-style: normal;

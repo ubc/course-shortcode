@@ -816,7 +816,7 @@ class UBC_Courses {
 			
 		   if($filtered_post){
 				$acrdn_ID = rand(0, 999);	//generate accordions with random ID's
-				$divHTML = $divHTML.'<div class="accordion" id="accordion'.$acrdn_ID.'"><div class="accordion-group"><div class="accordion-heading">
+				$divHTML = $divHTML.'<div class="accordion coursesacc" id="accordion'.$acrdn_ID.'"><div class="accordion-group"><div class="accordion-heading">
 				<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion'.$acrdn_ID.'" href="#collapse'.$acrdn_ID.'">'.$cat_name.'</a></div>
 				<div id="collapse'.$acrdn_ID.'" class="accordion-body collapse"><div class="accordion-inner">';
 				if ($postlist[0]->post_excerpt)
