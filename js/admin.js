@@ -148,7 +148,10 @@ function getInstructorData(department,course,stickyyear){
 function storeData(andSubmit){
   dataString = '';
   jQuery('div.instructor-list li.active').each( function(index) {
-     dataString += jQuery.trim(jQuery(this).find("#iname").text())+'*';
+    if (jQuery(this).find("#iname form").length == 0)  //contains no form
+        dataString += jQuery.trim(jQuery(this).find("#iname").text())+'*';
+     else
+        dataString += jQuery.trim(jQuery(this).attr("title"))+'*';
      jQuery(this).find(".icourse").each( function(index) {
        dataString += jQuery.trim(jQuery(this).text()) + ',';
      });
