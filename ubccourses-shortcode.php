@@ -737,7 +737,9 @@ class UBC_Courses {
 	   $subccalendarAPI = new ubcCalendarAPI($department, $course,true,$stickyyear,true);
            $section_xml = simplexml_load_string($subccalendarAPI->XMLData);
            foreach ($section_xml->section as $sections) {           
-              $instructor_name = $sections->instructors->instructor['name'];
+             foreach ($sections->instructors->instructor as $instructor) {           
+              //$instructor_name = $sections->instructors->instructor['name'];
+              $instructor_name = $instructor['name'];
               if (empty($instructor_name)||(trim($instructor_name) == "TBA")){
               }
               else{
@@ -748,6 +750,7 @@ class UBC_Courses {
                          array_push($output,array('name'=>trim($instructor_name),  'course'=>$department.$course));
                      }
               }
+             }
            }
            return $output;
            die();
