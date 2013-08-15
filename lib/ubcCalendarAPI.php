@@ -107,7 +107,14 @@ class ubcCalendarAPI {
 
      private function getReq() {
         if ($this->isSection) $this->req = 4;
-        else if ($this->course > 0) $this->req = 3; else $this->req = 2;
+        else 
+           if ($this->course > 0) 
+                $this->req = 3; 
+           else 
+                if ($this->department == '')
+                    $this->req = 0;
+                else
+                    $this->req = 2;
      }
 
      private function getDataURL() {
@@ -134,7 +141,7 @@ class ubcCalendarAPI {
                         return false;
                     }
                     else{  //Check if XML returns
-                        if ( (strpos($value,'courses') <= 0) && (strpos($value,'sections') <= 0) ) {          //if value doesn't contain "courses" or "sections"
+                    if ( (strpos($value,'courses') <= 0) && (strpos($value,'sections') <= 0) && (strpos($value,'depts') <= 0) ) {           //if value doesn't contain "courses" or "sections"
                               $this->XMLData = '<p>No XML - Empty file</p><br>';
                               return false;
                         }

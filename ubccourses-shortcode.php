@@ -705,14 +705,17 @@ class UBC_Courses {
                    $output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
 
                    $profileHTML = ''; 
-                   $instructor_name = $sections->instructors->instructor['name'];
+                   foreach ($sections->instructors->instructor as $instructor){ //-added
+                   $instructor_name = $instructor['name']; //-added
                    if ($profileslug){
                      $urlslugs = explode(', ',strtolower($instructor_name));
                      $profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
                      if (in_array(trim($instructor_name),$ubccalendarAPI->profileData))
                        $profileHTML = '<td><a style="line-height:11px;" class="btn btn-mini btn-danger" href="'.$profile_url.'">profile<a></td>';
                    }
-                   $output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML.'</tr>';
+                   $output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML;
+                   } // - addedfor each instructor
+                   $output .= '</tr>';
                    $count ++;
                  }
                  $output .= '</table>';
@@ -722,6 +725,32 @@ class UBC_Courses {
         }
 
 	
+	/**
+	 * getDeptCodes function.
+	 * 
+	 * @access private
+	 * @return void
+	 */
+	private function getDeptCodes(){
+		$ubccalendarAPI = new ubcCalendarAPI('', '', true,true, false);
+        $xml = simplexml_load_string($ubccalendarAPI->XMLData);
+        if($ubccalendarAPI->fromTransient)
+           $fserver_label = '<span style="color:green;"></span>';
+        else
+           $fserver_label = '<span style="color:red;">*</span>';
+        $count = 0; 
+        $output = '<select id="department" onkeypress="handleEnter(this.value, event);"  class="chzn-select" data-placeholder="Choose a Department Course Code..." style="width:350px;margin-top:-4px;" tabindex="1"><option value=""></option>'; 
+        foreach ($xml->dept as $dept) {
+                   $output .= '<option value="'.$dept['key'].'">'.$dept['key'].' - '.$dept['title'].$fserver_label.'</option>';
+                   $count ++;
+        }
+        $output .= '</select>';
+        if( $count == 0 ) 
+	        $output = '<br><strong>UNABLE TO RETRIEVE COURSE CODES</strong>';
+        return $output;
+    }
+
+
 	/**
 	 * enumerate_course function.
 	 * 
