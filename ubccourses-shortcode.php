@@ -763,24 +763,28 @@ class UBC_Courses {
 	public function enumerate_course($department,$course,$stickyyear){
            $instructorArr = array();
            $output = array();
-	   $subccalendarAPI = new ubcCalendarAPI($department, $course,true,$stickyyear,true);
+           $subccalendarAPI = new ubcCalendarAPI($department, $course,true,$stickyyear,true);
            $section_xml = simplexml_load_string($subccalendarAPI->XMLData);
-           foreach ($section_xml->section as $sections) {           
-             foreach ($sections->instructors->instructor as $instructor) {           
-              //$instructor_name = $sections->instructors->instructor['name'];
-              $instructor_name = $instructor['name'];
-              if (empty($instructor_name)||(trim($instructor_name) == "TBA")){
-              }
-              else{
-                     if (array_key_exists(trim($instructor_name),$instructorArr)){
-                     }
-                     else{ //New Instructor 
-                         $instructorArr[trim($instructor_name)] = $department.$course;
-                         array_push($output,array('name'=>trim($instructor_name),  'course'=>$department.$course));
-                     }
-              }
-             }
-           }
+               if (!empty($section_xml)) {
+                   foreach ($section_xml->section as $sections) {
+                        if (!empty($sections->instructors)) {
+                             foreach ($sections->instructors->instructor as $instructor) {           
+                                  //$instructor_name = $sections->instructors->instructor['name'];
+                                  $instructor_name = $instructor['name'];
+                                  if (empty($instructor_name)||(trim($instructor_name) == "TBA")){
+                                  }
+                                  else{
+                                         if (array_key_exists(trim($instructor_name),$instructorArr)){
+                                         }
+                                         else{ //New Instructor 
+                                             $instructorArr[trim($instructor_name)] = $department.$course;
+                                             array_push($output,array('name'=>trim($instructor_name),  'course'=>$department.$course));
+                                         }
+                                  }
+                             }
+                        }
+                   }
+                }
            return $output;
            die();
 	}
@@ -932,12 +936,13 @@ class UBC_Courses {
 	             "profileslug" => '',
 	             "instructors" => false,
 	             "stickywinter" => true,
-	             "stickyyear" => false
+	             "stickyyear" => false,
+                 "desc_category" => '',
              ), $atts));
 	
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors,$stickyyear);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors,$stickyyear,$desc_category);
              
 	}
 
