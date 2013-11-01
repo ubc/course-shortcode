@@ -126,7 +126,7 @@ function getInstructorData(department,course,stickyyear){
                var obj = jQuery.parseJSON(response);
                if ((obj) && !(typeof obj.data[0] === "undefined")){
                 jQuery.each( obj.data, function( key, value ) {
-                   var instrid = jQuery.trim(value.name.replace(/[\s,.]/g, ''));
+                   var instrid = jQuery.trim(value.name.replace(/[\s,.]/g, '').replace(/'/g, ''));
                    var courseid = jQuery.trim(value.course);
                    if (jQuery("li." + instrid).length == 0) {
                       jQuery('div.instructor-list ul').append('<li  class="active '+instrid+'" title="'+value.name+'"><span class="delbtn" onclick="update(this.parentNode);"></span><span id="iname" class="editable">'+value.name+'</span><span class="icourse '+courseid+'"> '+value.course+'</span></li>');
