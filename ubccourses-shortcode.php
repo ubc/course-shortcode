@@ -3,7 +3,7 @@
 Plugin Name: UBC Courses
 Plugin URI: https://github.com/ubc/course-shortcode
 Description: Allows the listing of UBC courses and sections with data from the UBC calendar.
-Version: 1.0.0
+Version: 1.0.1
 Author: Michael Ha/Enej Bajgoric/Shaffiq Rahemtulla/Navid Fattahi
 Author URI: http://isit.arts.ubc.ca
 License: GPL3
@@ -91,6 +91,7 @@ class UBC_Courses {
         //Add Admin Ajax actions
         add_action('wp_ajax_ubcinstructors_display_ajax',array(&$this, 'ubcinstructors_display_ajax'));
         add_action('wp_ajax_ubcdepartment_display_ajax',array(&$this, 'ubcdepartment_display_ajax'));
+        add_action('wp_ajax_deptcodelist_display_ajax',array(&$this, 'deptcodelist_display_ajax'));
 
         // Add shortcodes
 		add_shortcode('ubccourses', array($this, 'courses_shortcode'));
@@ -462,6 +463,14 @@ class UBC_Courses {
         }
     }
 
+    //Ajax function - dynamically get department codes
+    public function deptcodelist_display_ajax () {
+           $stickyyear = false;
+           if($_POST['stickyyear'] === 'true') $stickyyear = true;
+           echo $this->getDeptCodes($stickyyear);
+           die();
+    }
+
     //Ajax function - dynamically get sections of a course
     public function ubcsections_display_ajax () {
            //get post parameters    
@@ -731,8 +740,8 @@ class UBC_Courses {
 	 * @access private
 	 * @return void
 	 */
-	private function getDeptCodes(){
-		$ubccalendarAPI = new ubcCalendarAPI('', '', true,true, false);
+	private function getDeptCodes($stickyyear){
+		$ubccalendarAPI = new ubcCalendarAPI('', '', true,$stickyyear, false);
         $xml = simplexml_load_string($ubccalendarAPI->XMLData);
         if($ubccalendarAPI->fromTransient)
            $fserver_label = '<span style="color:green;"></span>';
@@ -746,7 +755,7 @@ class UBC_Courses {
         }
         $output .= '</select>';
         if( $count == 0 ) 
-	        $output = '<br><strong>UNABLE TO RETRIEVE COURSE CODES</strong>';
+	        $output = '<select id="department" onkeypress="handleEnter(this.value, event);"  class="chzn-select" data-placeholder="Unable to Retrieve Codes..." style="width:350px;margin-top:-4px;" tabindex="1"><option value=""></option></select>';
         return $output;
     }
 

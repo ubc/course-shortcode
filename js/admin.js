@@ -78,6 +78,13 @@ jQuery(document).ready(function($){
        storeData(true); 
   });
 
+  $("#stickyyear").click(function() {
+       if (this.checked)
+           getdeptcodeList('true');
+       else
+           getdeptcodeList('false');
+  });
+
   $("#opens_ubccourses").click(function(e) {
       e.preventDefault();       
       $('#ubccoursesmodal').dialog({
@@ -105,6 +112,24 @@ jQuery(document).ready(function($){
   });
 
 });
+
+function getdeptcodeList(stickyyear){
+          jQuery.ajax({
+             url: JSParams.ajaxurl,
+             type: 'POST',
+             data: {
+                action: 'deptcodelist_display_ajax',
+                stickyyear: stickyyear
+             },
+             dataType: 'html', 
+             success: function(response){     
+               jQuery( "#department_chzn" ).remove(); 
+               jQuery( "#department" ).replaceWith( response );
+               jQuery(".chzn-select").chosen({no_results_text: "No results matched"});
+             }
+          });
+     return false;
+ }
 
 function getInstructorData(department,course,stickyyear){
           jQuery.ajax({
