@@ -714,16 +714,18 @@ class UBC_Courses {
                    $output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
 
                    $profileHTML = ''; 
+                   if( isset($sections->instructors) && is_array($sections->instructors->instructor) ):
                    foreach ($sections->instructors->instructor as $instructor){ //-added
-                   $instructor_name = $instructor['name']; //-added
-                   if ($profileslug){
-                     $urlslugs = explode(', ',strtolower($instructor_name));
-                     $profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
-                     if (in_array(trim($instructor_name),$ubccalendarAPI->profileData))
-                       $profileHTML = '<td><a style="line-height:11px;" class="btn btn-mini btn-danger" href="'.$profile_url.'">profile<a></td>';
-                   }
-                   $output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML;
+                   		$instructor_name = $instructor['name']; //-added
+                   		if ($profileslug){
+                    		$urlslugs = explode(', ',strtolower($instructor_name));
+                     		$profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
+                     			if (in_array(trim($instructor_name),$ubccalendarAPI->profileData))
+                       				$profileHTML = '<td><a style="line-height:11px;" class="btn btn-mini btn-danger" href="'.$profile_url.'">profile<a></td>';
+                   		}
+                   		$output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML;
                    } // - addedfor each instructor
+                   endif;
                    $output .= '</tr>';
                    $count ++;
                  }
