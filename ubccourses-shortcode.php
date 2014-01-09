@@ -714,8 +714,9 @@ class UBC_Courses {
                    $output .= '<td>'.implode(" ",$term).'</td><td>'.implode(" ",$day).'</td><td>'.implode(" ",$bld).'</td>';
 
                    $profileHTML = ''; 
-                   if( isset($sections->instructors) && is_array($sections->instructors->instructor) ):
-                   foreach ($sections->instructors->instructor as $instructor){ //-added
+                   $instructors =  $sections->instructors->instructor; 
+                   if(is_array($instructors) || $instructors instanceof Traversable):               
+                   foreach ($instructors as $instructor){ //-added
                    		$instructor_name = $instructor['name']; //-added
                    		if ($profileslug){
                     		$urlslugs = explode(', ',strtolower($instructor_name));
