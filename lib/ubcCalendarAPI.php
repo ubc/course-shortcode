@@ -86,18 +86,27 @@ class ubcCalendarAPI {
 //###########MOD###########
 
      function getCurrentSession() {
-       if ($this->stickywinter){
-         $this->currentSession = "W";
+       switch ($this->stickywinter){
+         case "W":
+            $this->currentSession = "W";
+            break;
+         case "S":
+            $this->currentSession = "S";
+            break;
+         case true:
+            $this->currentSession = "W";
+            break;
+         default:
+            $currentMonth = date('n');
+            if (($currentMonth >= 5)&&($currentMonth < 9)){
+               $this->currentSession = "S";
+            } else{
+               $this->currentSession = "W";
+            }
        }
-       else{
-         $currentMonth = date('n');
-         if (($currentMonth >= 5)&&($currentMonth < 9)){
-             $this->currentSession = "S";
-         } else{
-             $this->currentSession = "W";
-         }
-       }
-       }
+     }
+
+
      function getCurrentYear() {
        $currentYear = date('Y');  $currentMonth = date('n');
               if ((( $this->currentSession == "W" ) && ($currentMonth > 8)) || ($this->stickyyear))

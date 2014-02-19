@@ -562,6 +562,14 @@ class UBC_Courses {
 		  if ((intval(substr($tabcount,1,2)) > 6)||(intval(substr($tabcount,1,2)) < 1)) $tabcount = "n1";
 		}
 
+                //Validate stickywinter - 
+                if ((strtoupper($stickywinter) == 'S')||( strtoupper($stickywinter) == 'W'))
+                     $stickywinter = strtoupper($stickywinter);
+                else{
+                   if (is_bool($stickywinter) == false)
+                        $stickywinter = false;
+                }
+
 		$ubccalendarAPI = new ubcCalendarAPI($department, $course, $stickywinter,$stickyyear, false);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
                 if($ubccalendarAPI->fromTransient)

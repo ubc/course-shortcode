@@ -44,7 +44,7 @@
 <li><strong>desc_category</strong> - the category slug - if entered, any post title (of the form e.g. “ANTH201A” that has the category equal to the slug will shown in an accordion format below the calendar description with the accordion header being set to the category name (not slug).</li>
 <li><strong>opentab</strong> - default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill</li>
 <li><strong>profileslug</strong> - if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.</li>
-<li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
+<li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun. Can be explicitly set to "W" or "S" to override this.</li>
 <li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
 <li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).<i> Note: If the calendar name differs from the profile name, the cross match can be made on the plugin admin page by double clicking the instructor name on the list and setting it to be the same as the profile name.</i></li>
 </ul>
