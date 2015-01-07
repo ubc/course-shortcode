@@ -3,7 +3,7 @@
 Plugin Name: UBC Courses
 Plugin URI: https://github.com/ubc/course-shortcode
 Description: Allows the listing of UBC courses and sections with data from the UBC calendar.
-Version: 1.0.1
+Version: 1.0.2
 Author: Michael Ha/Enej Bajgoric/Shaffiq Rahemtulla/Navid Fattahi
 Author URI: http://isit.arts.ubc.ca
 License: GPL3
@@ -28,7 +28,7 @@ require_once( dirname( __FILE__ ) . '/lib/constants.php' );
 class UBC_Courses {
     var $namespace = "ubccourses";
     var $friendly_name = "UBC Courses";
-    var $version = "1.0.0";
+    var $version = "1.0.2";
     var $maxcharlimit = 10000; //limit for option size
     
     // Default plugin options
@@ -842,7 +842,7 @@ class UBC_Courses {
                if (!empty($section_xml)) {
                    foreach ($section_xml->section as $sections) {
                         if (!empty($sections->instructors)) {
-                             foreach ($sections->instructors->instructor as $instructor) {           
+                             foreach ($sections->instructors->instructor as $instructor) {           
                                   //$instructor_name = $sections->instructors->instructor['name'];
                                   $instructor_name = $instructor['name'];
                                   if (empty($instructor_name)||(trim($instructor_name) == "TBA")){
