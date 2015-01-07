@@ -2,7 +2,7 @@
 Plugin Name: UBC Courses
 Plugin URI: https://github.com/ubc/course-shortcode
 Description: Allows the listing of UBC courses and sections with data from the UBC calendar.
-Version: 1.0.0
+Version: 1.0.2
 Author: Michael Ha (CTLT) and Shaffiq Rahemtulla (ArtsISIT)
 Author URI: http://isit.arts.ubc.ca
 License: GPL3
@@ -33,6 +33,7 @@ In its basic form the [ubccourses] shortcode allows the listing of UBC courses w
  - profileslug (**New parameter not in production – default ” – if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.
  - sticky winter (**New parameter not in production – default ‘false’ – if true session remains as Winter even if Summer term has begun.
  - instructors (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them).
+ - fuzzy (default on and set to 80% - does fuzzy matching of instructor names (80% usually "fixes" special char issues in a name))
 
 == [ubcinstructors] shortcode ==
 
