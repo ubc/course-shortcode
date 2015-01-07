@@ -76,7 +76,7 @@
   width: 12px;
   height: 12px;
   font-size: 1px;
-  background: url('chosen-sprite.png') -42px 1px no-repeat;
+  //background: url('chosen-sprite.png') -42px 1px no-repeat;
 }
 .chzn-container-single .chzn-single abbr:hover {
   background-position: -42px -10px;

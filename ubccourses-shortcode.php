@@ -291,6 +291,48 @@ class UBC_Courses {
     }
     
 	
+    /**
+     * profile_exists function
+     * 
+     * @uses in_array()
+     * @param mixed $ubccalendarAPI
+     * @returns post slug name to be used in url
+     */
+    function profile_exists($fuzzy,$ubccalendarAPI,$profileslug,$instrName,$flag=true) {
+	$urlslugs = explode(', ',strtoupper($instrName));
+	$shortest=-1;
+	$numchar = 0;
+	$count = 0;
+	foreach($ubccalendarAPI->profileData[0] as $word){
+		$lev=levenshtein(trim($instrName),$word);
+		if($lev==0){
+			$numchar = strlen($word);
+			$mindex = $count;
+			$closest=strtoupper($word);
+			$shortest=0;
+			break;
+		}
+		if($lev<=$shortest||$shortest<0){
+			$numchar = strlen($word);
+			$mindex = $count;
+			$closest=strtoupper($word);
+			$shortest=$lev;
+		}
+		$count ++;
+	}
+	$percentage_match = (($numchar-$shortest)/$numchar * 100);
+	if ($percentage_match > $fuzzy){
+           if ($flag)
+	     return $ubccalendarAPI->profileData[1][$mindex];
+	   else 
+	     return '<a href="'.$ubccalendarAPI->profileData[1][$mindex].'">'.$ubccalendarAPI->profileData[2][$mindex].'</a>';
+	}
+        else
+            return false;
+    }
+	
+
+
    /**
     * get_courseInstructors function.
     * 
@@ -304,7 +346,7 @@ class UBC_Courses {
     * @param mixed $profileslug
     * @return void
     */
-   private function get_courseInstructors( $option_name, $ubcCourse, $ubccalendarAPI, $profileslug ) {
+   private function get_courseInstructors($fuzzy, $option_name, $ubcCourse, $ubccalendarAPI, $profileslug ) {
         if( !isset( $this->options ) || empty( $this->options ) ) {
             $this->options = get_option( $this->option_name, $this->defaults );
         }
@@ -317,10 +359,11 @@ class UBC_Courses {
                      $instrName = trim($instrPieces[0]);
 
                      if ($profileslug){
-                        $urlslugs = explode(', ',strtolower($instrName));
-                        $profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
-                        if (in_array(trim($instrName),$ubccalendarAPI->profileData))
-                            $profileHTML = '<a href="'.$profile_url.'">'.$instrName.'</a>';
+//MOD
+			$profile_link = $this->profile_exists($fuzzy, $ubccalendarAPI,$profileslug,$instrName,false);
+
+                        if ($profile_link)
+                            $profileHTML = $profile_link;
                         else 
                             $profileHTML = $instrName;
                      }
@@ -359,7 +402,7 @@ class UBC_Courses {
      * @param mixed $instructors
      * @return void
      */
-    private function get_instructorCourses( $option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear, $desc_category ) {
+    private function get_instructorCourses( $fuzzy,$option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear, $desc_category ) {
 
         //if profile name is empty AND your are on a profile AND singular page
         if ((empty($profileName))&&('profile_cct' == get_post_type($post->ID))&&(is_single())){
@@ -378,12 +421,22 @@ class UBC_Courses {
                  $instrArray = explode(":", $this->options[$option_name]);
                  foreach ($instrArray as $instrData) {
                      $instrPieces = explode("*", $instrData);
-                     $instrName = trim($instrPieces[0]);
-                     if (($profileName == $instrName)||((strpos($instrName, $lname) !== false) && (strpos($instrName, $fname) !== false))){
+                     $instrName = strtoupper(trim($instrPieces[0]));
+//MOD
+		     if (empty($profileName))
+			$word=strtoupper($lname.', '.$fname);
+		     else
+			$word=strtoupper($profileName);
+
+		     $numchar = strlen($word);
+		     $lev = levenshtein($instrName,$word);
+		     $percentage_match = (($numchar-$lev)/$numchar * 100);
+
+                     if ($percentage_match > $fuzzy){
                              $instID = trim(preg_replace('/[ ,]+/','', $instrName));
                              $instrCourseArray = explode(",",$instrPieces[1]);
                              foreach ($instrCourseArray as $course) {
-                                 $htmlstr .= $this->getList( substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
+                                 $htmlstr .= $this->getList($fuzzy, substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
                              }
                              return $htmlstr;
                       }
@@ -473,7 +526,8 @@ class UBC_Courses {
 
     //Ajax function - dynamically get sections of a course
     public function ubcsections_display_ajax () {
-           //get post parameters    
+           //get post parameters   
+	   $fuzzy = $_POST['fuzzy']; 
            $department = $_POST['department'];
            $course = $_POST['course'];
            $profileslug = $_POST['profileslug'];
@@ -481,7 +535,7 @@ class UBC_Courses {
            $stickyyear = false;
            if($_POST['stickyyear'] === "true") $stickyyear = true;
            //return to js
-           echo $this->show_section_table($department,$course,$profileslug,$stickywinter,$stickyyear);  
+           echo $this->show_section_table($fuzzy,$department,$course,$profileslug,$stickywinter,$stickyyear);  
            die();
     }
 
@@ -548,7 +602,7 @@ class UBC_Courses {
 	 * @param mixed $desc_category
 	 * @return void
 	 */
-	private function getList($department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear, $desc_category){
+	private function getList($fuzzy,$department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear, $desc_category){
 		//include_once 'ubcCalendarAPI.php';
 
 		//Need to validate parameters
@@ -589,14 +643,14 @@ class UBC_Courses {
 				$offset = 1;
                 foreach ($xml->course as $courses) { 
                    if ($instructors){
-                       $instrstr = $this->get_courseInstructors('option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
+                       $instrstr = $this->get_courseInstructors($fuzzy,'option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
                    }
                    $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
 				   
 				   $descaccordion = $this->getDescAccordion($department.$courses['key'],$desc_category);
 				   
                    //$params = "'".$department."', '".$courses['key']."' "; 
-                   $params = "'".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."','".$stickyyear."'"; 
+                   $params = "'".$fuzzy."','".$department."','".$courses['key']."','".$profileslug."','".$stickywinter."','".$stickyyear."'"; 
                    $section = '<a onclick="getSectionData('.$params.');" href="#myModal" role="button" class="btn btn-mini modalbox" data-toggle="modal">Sections</a>';
                    if (empty($course)&&($pills)||empty($course)&&($tabs)){
                        $cindex = substr($courses['key'], 0, 1);
@@ -686,7 +740,7 @@ class UBC_Courses {
      * @param mixed $stickywinter
      * @return void
      */
-    public function show_section_table($department,$course,$profileslug,$stickywinter,$stickyyear) {  
+    public function show_section_table($fuzzy,$department,$course,$profileslug,$stickywinter,$stickyyear) {  
 			//include_once 'ubcCalendarAPI.php';
 			$ubccalendarAPI = new ubcCalendarAPI($department, $course,$stickywinter,$stickyyear,true);
                 $xml = simplexml_load_string($ubccalendarAPI->XMLData);
@@ -726,10 +780,10 @@ class UBC_Courses {
                    if(is_array($instructors) || $instructors instanceof Traversable):               
                    foreach ($instructors as $instructor){ //-added
                    		$instructor_name = $instructor['name']; //-added
+				
                    		if ($profileslug){
-                    		$urlslugs = explode(', ',strtolower($instructor_name));
-                     		$profile_url = '/'.$profileslug.'/'.$urlslugs[1].'-'.$urlslugs[0].'/';
-                     			if (in_array(trim($instructor_name),$ubccalendarAPI->profileData))
+					$profile_url = $this->profile_exists($fuzzy,$ubccalendarAPI,$profileslug,$instructor_name);
+                     			if ($profile_url)
                        				$profileHTML = '<td><a style="line-height:11px;" class="btn btn-mini btn-danger" href="'.$profile_url.'">profile<a></td>';
                    		}
                    		$output .= '<td><a target="_blank" href="'.$inst_link.'">'.$instructor_name.'</a></td>'.$profileHTML;
@@ -929,12 +983,13 @@ class UBC_Courses {
 	             "instructors" => '',
 	             "stickywinter" => false,
 	             "stickyyear" => false,
+		     "fuzzy" => 80,
 				 "desc_category" => ''
              ), $atts));
 		
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList( $department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->getList($fuzzy,$department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
 	}
 	
 	/**
@@ -958,11 +1013,12 @@ class UBC_Courses {
 	             "stickywinter" => true,
 	             "stickyyear" => false,
                  "desc_category" => '',
+		 "fuzzy" => 80
              ), $atts));
 	
              //Get Ajax url and setup js vars
              $ajaxurl = admin_url('admin-ajax.php' );
-             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses('option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors,$stickyyear,$desc_category);
+             return '<script> var ajaxurl = "'.$ajaxurl.'"; </script>'.$this->get_instructorCourses($fuzzy,'option_2',$instructorname, $parentslug, $profileslug, $stickywinter,$instructors,$stickyyear,$desc_category);
              
 	}
 

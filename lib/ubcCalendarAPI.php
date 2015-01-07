@@ -59,7 +59,10 @@ class ubcCalendarAPI {
                     //Create the dataArray
                     $firstname = trim($profiledataArray['name']['first']);             //chk
                     $lastname = trim($profiledataArray['name']['last']);               //chk
-                    $dataArray[$count] = $lastname.', '.$firstname;
+ //MOD
+                    $dataArray[0][$count] = strtoupper($lastname).', '.strtoupper($firstname);
+                    $dataArray[1][$count] = get_permalink($post->ID);
+		    $dataArray[2][$count] = $lastname.', '.$firstname;
                     $count++;
                   }
              }
@@ -76,6 +79,7 @@ class ubcCalendarAPI {
 
              //set the class var
              $this->profileData = $dataArray;                        //chk
+		//print_r($dataArray);
           }  
           else{ //transient data exists!! Could be crap!!!
 

@@ -47,6 +47,7 @@
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun. Can be explicitly set to "W" or "S" to override this.</li>
 <li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
 <li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them).<i> Note: If the calendar name differs from the profile name, the cross match can be made on the plugin admin page by double clicking the instructor name on the list and setting it to be the same as the profile name.</i></li>
+<li><strong>fuzzy</strong> - default on and set to 80% - does fuzzy matching of instructor names (80% usually "fixes" special char issues in a name)</li>
 </ul>
 </div>
 
@@ -61,6 +62,7 @@
 <li><strong>stickywinter</strong> - if true session remains as Winter even if Summer term has begun.</li>
 <li><strong>stickyyear</strong> - if true session year is forced to current year.</li>
 <li><strong>instructors</strong> - if true and plugin configured (via the settings panel), will list instructors on the main course listing page (without users having to click on the "sections" button to see them). <i>Note: If the calendar name differs from the profile name, the cross match can be made on the plugin admin page by double clicking the instructor name on the list and setting it to be the same as the profile name.</i></li>
+<li><strong>fuzzy</strong> - default on and set to 80% - does fuzzy matching of instructor names (80% usually "fixes" special char issues in a name)</li>
 </ul>
 
 <i>**If used without the instructorname parameter and on a profile singular page, will show courses taught by that instructor. <i>Hint: Can be placed in "if empty" container in a profile field</i>.
@@ -86,14 +88,14 @@
    <button id="saveBtn" class="button-primary" style="display:none;border-radius:4px;margin-right:4px;" >Save Changes</button>
    <input type="checkbox" id="stickyyear" name="stickyyear" value="1">stickyyear?<br>
 </div>
-<div class='instructor-list'><div id='status'></div><ul><?php echo $this->get_option( 'option_2',true );?></ul></div>
+<div class='instructor-list'><div id='status'></div><ul><?php echo stripslashes($this->get_option( 'option_2',true ));?></ul></div>
 </div>
         
     <form class="settings-form" id="settings-form" action="" method="post" id="<?php echo $namespace; ?>-form">
         <?php wp_nonce_field( $namespace . "-update-options" ); ?>
         
          <p>
-            <label><input type="hidden" id="instructordata" type="text" name="data[option_2]" value="<?php echo $this->get_option( 'option_2',false ); ?>" /></label> 
+            <label><input type="hidden" id="instructordata" type="text" name="data[option_2]" value="<?php echo stripslashes($this->get_option( 'option_2',false )); ?>" /></label> 
         </p>
         
         <!--<p class="isubmit">
@@ -102,4 +104,4 @@
     </form>
 </div>
 
-<div id="revert" style="display:none;"><?php echo $this->get_option( 'option_2',true );?></div>
+<div id="revert" style="display:none;"><?php echo stripslashes($this->get_option( 'option_2',true ));?></div>

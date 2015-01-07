@@ -1,9 +1,10 @@
-function getSectionData(department,course,profileslug,stickywinter,stickyyear){
+function getSectionData(fuzzy,department,course,profileslug,stickywinter,stickyyear){
           jQuery.ajax({
              url: ajaxurl,
              type: 'POST',
              data: {
                 action: 'ubcsections_display_ajax',
+		fuzzy:fuzzy,
                 department: department,
                 course: course,
                 profileslug: profileslug,
