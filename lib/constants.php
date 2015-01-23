@@ -11,4 +11,4 @@ if( !defined( 'UBC_COURSES_VERSION' ) ) define( 'UBC_COURSES_VERSION', '1.0.0' )
 if( !defined( 'UBC_COURSES_DIRNAME' ) ) define( 'UBC_COURSES_DIRNAME', dirname( dirname( __FILE__ ) ) );
 
 // The URL path of this plugin
-if( !defined( 'UBC_COURSES_URLPATH' ) ) define( 'UBC_COURSES_URLPATH', WP_PLUGIN_URL . "/" . plugin_basename( UBC_COURSES_DIRNAME ) );
+if( !defined( 'UBC_COURSES_URLPATH' ) ) define( 'UBC_COURSES_URLPATH', plugins_url() . "/" . plugin_basename( UBC_COURSES_DIRNAME ) );
