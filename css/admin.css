@@ -1,6 +1,6 @@
 /**
  * Admin Control Panel Stylesheets
- * 
+ *
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -19,3 +19,6 @@ li.noPad{padding:0;width:360px;}
 form{display:inline-block;}
 .btnSave, .btnDiscard{padding:6px 0 4px 4px;}
 .progress-label{float:left;text-shadow:1px 1px 0 #fff;}
+body.settings_page_ubccourses .ui-dialog{background-color:white;top:40px;}
+.ui-state-default .ui-icon{background-image:url("../images/ui-icons_888888_256x240.png")!important;}
+.ui-progressbar-value{background-color:#00a0d2;}
