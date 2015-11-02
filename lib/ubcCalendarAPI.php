@@ -32,7 +32,7 @@ class ubcCalendarAPI {
 	 //###########MOD###########
 	private function getProfileData() {
 		//Set Unique key using department code
-		$key = 'ubccc_profiles'.$this->department;    //chk
+		$key = 'ubccc_prof_'.md5( $this->department );    //chk
 
 		//Get transient value
 		$profileDataSerialized = get_transient( $key );      //chk
@@ -53,14 +53,14 @@ class ubcCalendarAPI {
 				while ( $profiles->have_posts( ) ) {                      //chk
 					$profiles->the_post();                             //chk
 					//Get meta data and create the data
-					$custom_fields = get_post_custom( $profiles->$post->ID );                       //chk
+					$custom_fields = get_post_custom( get_the_ID() );                       //chk
 					$profile_custom_field = $custom_fields['profile_cct'];             //chk
 					$profiledataArray = maybe_unserialize( $profile_custom_field[0] );   //chk
 					//Create the dataArray
 					$firstname = trim( $profiledataArray['name']['first'] );             //chk
 					$lastname = trim( $profiledataArray['name']['last'] );               //chk
 					$dataArray[0][ $count ] = strtoupper( $lastname ).', '.strtoupper( $firstname );
-					$dataArray[1][ $count ] = get_permalink( $profiles->$post->ID );
+					$dataArray[1][ $count ] = get_permalink( get_the_ID() );
 					$dataArray[2][ $count ] = $lastname.', '.$firstname;
 					$count++;
 				}
@@ -137,7 +137,7 @@ class ubcCalendarAPI {
 	}
 
 	private function getCalendarData() {
-		$key = 'ubccc'.md5( $this->dataURL );            //Set Unique key using url
+		$key = 'ubccc_cal_'.md5( $this->dataURL );            //Set Unique key using url
 		$this->XMLData = get_transient( $key );          //Get transient value
 		if ( empty( $this->XMLData ) ) {          //If the transient does not exist
 			if ( $this->get_file_contents_from_calendar() ) {  //return is true
