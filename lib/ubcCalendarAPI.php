@@ -32,7 +32,7 @@ class ubcCalendarAPI {
 	 //###########MOD###########
 	private function getProfileData() {
 		//Set Unique key using department code
-		$key = 'ubccc_prof_'.md5( $this->department );    //chk
+		$key = 'ubccc_p'.md5( $this->department );    //chk
 
 		//Get transient value
 		$profileDataSerialized = get_transient( $key );      //chk
@@ -137,7 +137,7 @@ class ubcCalendarAPI {
 	}
 
 	private function getCalendarData() {
-		$key = 'ubccc_cal_'.md5( $this->dataURL );            //Set Unique key using url
+		$key = 'ubccc_c'.md5( $this->dataURL );            //Set Unique key using url
 		$this->XMLData = get_transient( $key );          //Get transient value
 		if ( empty( $this->XMLData ) ) {          //If the transient does not exist
 			if ( $this->get_file_contents_from_calendar() ) {  //return is true
