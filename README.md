@@ -39,7 +39,7 @@ In its basic form the [ubccourses] shortcode allows the listing of UBC courses w
 
  - `profileslug` (!New parameter not in production – default ” – if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.
 
- - `stickywinter` (**New parameter not in production** – default ‘false’ – if true session remains as Winter even if Summer term has begun.
+ - `stickywinter` (**New parameter not in production** – default ‘false’ – if true session remains as Winter even if Summer term has begun. set to
 
  - `instructors={either true or false}` (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them).
 
@@ -64,6 +64,10 @@ Some of the allowed parameters are as below:
  - `stickywinter={either true or false}` (**New parameter not in production** – default ‘false’ – if true session remains as Winter even if Summer term has begun.
 
  - `instructors={either true or false}` (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them.
+ 
+## Examples
+
+1. 
 
 
 ## Installation
