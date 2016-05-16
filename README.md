@@ -31,15 +31,17 @@ In its basic form the [ubccourses] shortcode allows the listing of UBC courses w
 
  - `pills={either true or false}` (default false – if true, the data is setup with pills for each level of courses e.g. 100 year level, 200 year level etc).
 
- - `tabcount={enter number}`(default 4 – if true, the data is truncated  at the level level of courses e.g. 400 year level).
+ - `tabcount={enter number}`Enter "g" for graduate courses only, "n" for undergraduate only. Enter "n*" for a particular year. E.g. n3 for 300 level courses.
 
  - `parentslug` (default ” – if entered, any page title (of the form e.g. “ANTH201A” that matches has has a parent equal to the slug will be linked to from the list with a “Details” button
 
  - `opentab` (**New parameter not in production** – default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill.
 
  - `profileslug` (!New parameter not in production – default ” – if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.
+ 
+ - `stickyyear` - if true, then the shortcode will always pull up courses in the current year. 
 
- - `stickywinter` (**New parameter not in production** – default ‘false’ – if true session remains as Winter even if Summer term has begun. set to
+ - `stickywinter` (**New parameter not in production** – default ‘false’ – if true session remains as Winter even if Summer term has begun. Set to "W" to display winter courses. And "S" to display summer courses. Also declare stickyyear as true in this case. See examples for more detail.
 
  - `instructors={either true or false}` (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them).
 
@@ -67,8 +69,20 @@ Some of the allowed parameters are as below:
  
 ## Examples
 
-1. 
+### Simple tabbed example:
+`[ubccourses department=EDCP tabs=true instructors=true stickyyear=true tabcount=6 opentab=3]`
 
+### Displaying one course:
+`[ubccourses department=EDCP course=302A]`
+
+### Displaying Graduate courses only
+`[ubccourses department=EDCP instructors=true stickyyear=true tabcount=g pills=true]`
+
+### Force summer courses in a particular year
+`[ubccourses department=LLED stickyyear=true stickywinter="S" tabcount=n3]`
+
+### Force winter courses in a particular year
+`[ubccourses department=LLED stickyyear=true stickywinter="W" tabs=true]`
 
 ## Installation
 
