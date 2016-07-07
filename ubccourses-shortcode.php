@@ -436,7 +436,13 @@ class UBC_Courses {
 							 $instID = trim(preg_replace('/[ ,]+/','', $instrName));
 							 $instrCourseArray = explode(",",$instrPieces[1]);
 							 foreach ($instrCourseArray as $course) {
-								 $htmlstr .= $this->getList($fuzzy, substr($course, 0, 4), substr($course, 4), false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
+								 $coursedept = substr($course, 0, 4);
+								 $courseid = substr($course, 4);
+			   					 if (preg_match('/\\d/', $coursedept) > 0){
+								     	$coursedept = substr($course, 0, 3);
+								     	$courseid = substr($course, 3);	
+								 }
+								 $htmlstr .= $this->getList($fuzzy, $coursedept, $courseid, false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
 							 }
 							 return $htmlstr;
 					  }
