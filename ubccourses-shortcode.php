@@ -635,9 +635,9 @@ class UBC_Courses {
 				$ubccalendarAPI->getCurrentSession();
 				$ubccalendarAPI->getCurrentYear;
 				if ($ubccalendarAPI->currentSession == "W")
-					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
+					$fserver_label .= '<span class="sessionlabel" style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
 				else
-					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
+					$fserver_label .= '<span class="sessionlabel" style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
 
 				$count = 0;
 				$offset = 1;
@@ -752,9 +752,9 @@ class UBC_Courses {
 				$ubccalendarAPI->getCurrentSession();
 				$ubccalendarAPI->getCurrentYear;
 				if ($ubccalendarAPI->currentSession == "W")
-					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
+					$fserver_label .= '<span class="sessionlabel" style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
 				else
-					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
+					$fserver_label .= '<span class="sessionlabel" style="font-size:10px;color:grey;margin-left:4px;">Summer '.$ubccalendarAPI->currentYear.'</span>';
 
 				$count = 0;
 				$output = '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>';
