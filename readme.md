@@ -31,7 +31,8 @@ In its basic form the [ubccourses] shortcode allows the listing of UBC courses w
  - parentslug (default ” – if entered, any page title (of the form e.g. “ANTH201A” that matches has has a parent equal to the slug will be linked to from the list with a “Details” button
  - opentab (**New parameter not in production – default 1 – has to be between 1 and tabcount – if entered will auto open at that tab/pill
  - profileslug (**New parameter not in production – default ” – if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.
- - sticky winter (**New parameter not in production – default ‘false’ – if true session remains as Winter even if Summer term has begun.
+ - stickywinter (**New parameter not in production – default ‘false’ – if true session remains as Winter even if Summer term has begun.
+ - stickyyear (default false - if true, then the year is forced to be this year, which fixes a bug that causes the previous year's summer courses to be listed instead of the current year's)
  - instructors (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them).
  - fuzzy (default on and set to 80% - does fuzzy matching of instructor names (80% usually "fixes" special char issues in a name))
 
@@ -46,7 +47,8 @@ Some of the allowed parameters are as below:
  - instructorname (default '' - if entered and plugin configured (via the settings panel), will list all courses that an instructor teaches within the current session)
  - parentslug (default ” – if entered, any page title (of the form e.g. “ANTH201A” that matches has has a parent equal to the slug will be linked to from the list with a “Details” button
  - profileslug (**New parameter not in production – default ” – if entered and a profile exists on the website, shows a link next to instructors name in the sections listing.
- - sticky winter (**New parameter not in production – default ‘false’ – if true session remains as Winter even if Summer term has begun.
+ - stickywinter (**New parameter not in production – default ‘false’ – if true session remains as Winter even if Summer term has begun.
+ - stickyyear (default false - if true, then the year is forced to be this year, which fixes a bug that causes the previous year's summer courses to be listed instead of the current year's)
  - instructors (default false - if true and plugin configured (via the settings panel), will list instructors on the main listing page (without users having to click on the "sections" button to see them.
 
 

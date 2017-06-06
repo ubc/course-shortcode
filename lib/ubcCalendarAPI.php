@@ -109,7 +109,7 @@ class ubcCalendarAPI {
 	function getCurrentYear() {
 		$currentYear = date( 'Y' );
 		$currentMonth = date( 'n' );
-		if ( ( ( $this->currentSession == 'W' ) && ( $currentMonth > 8 )) || ( $this->stickyyear ) ) {
+		if ( ( ( $this->currentSession == 'W' ) && ( $currentMonth > 8 )) || ( $this->stickyyear ) || ( $this->currenSession == 'S' )) {
 			$this -> currentYear = $currentYear;
 		} else {
 			$this -> currentYear = $currentYear - 1;
