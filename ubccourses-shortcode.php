@@ -268,7 +268,7 @@ class UBC_Courses {
 				 if (count($instrPieces) == 2)
 				   $cinstrName = trim($instrPieces[0]);
 				 else
-				   $cinstrName = trim($instrPieces[2]);
+				   $cinstrName = ( isset( $instrPieces[2] ) ) ? trim( $instrPieces[2] ) : '';
 				 if (!empty($instrName)){
 					$instID = trim(preg_replace('/[ ,]+/','', $cinstrName));
 					$instrCourseArray = explode(",",$instrPieces[1]);
@@ -431,12 +431,13 @@ class UBC_Courses {
 			 $numchar = strlen($word);
 			 $lev = levenshtein($instrName,$word);
 			 $percentage_match = (($numchar-$lev)/$numchar * 100);
+			 $htmlstr = '';
 
 					 if ($percentage_match > $fuzzy){
 							 $instID = trim(preg_replace('/[ ,]+/','', $instrName));
 							 $instrCourseArray = explode(",",$instrPieces[1]);
 							 foreach ($instrCourseArray as $course) {
-								$carr = preg_split('/(?<=[A-Z])(?=[0-9]+)/i',$course); 
+								$carr = preg_split('/(?<=[A-Z])(?=[0-9]+)/i',$course);
 								$htmlstr .= $this->getList($fuzzy, $carr[0], $carr[1], false, false, 4, $parentslug, 1, $profileslug, $stickywinter,$instructors,$stickyyear, $desc_category);
 							 }
 							 return $htmlstr;
@@ -634,7 +635,7 @@ class UBC_Courses {
 
 				// Put current sessions's label
 				$ubccalendarAPI->getCurrentSession();
-				$ubccalendarAPI->getCurrentYear;
+				$ubccalendarAPI->getCurrentYear();
 				if ($ubccalendarAPI->currentSession == "W")
 					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
 				else
@@ -642,9 +643,12 @@ class UBC_Courses {
 
 				$count = 0;
 				$offset = 1;
+				$output = '';
 				foreach ($xml->course as $courses) {
 				   if ($instructors){
 					   $instrstr = $this->get_courseInstructors($fuzzy,'option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
+				   } else {
+					$instrstr = '';
 				   }
 				   $detailsbtn = $this->getDetailsBtn($department.$courses['key'],$parentslug);
 
@@ -751,7 +755,7 @@ class UBC_Courses {
 				   $fserver_label = '<i style="margin-left:4px;color:gray;" class="icon-calendar"></i>';
 
 				$ubccalendarAPI->getCurrentSession();
-				$ubccalendarAPI->getCurrentYear;
+				$ubccalendarAPI->getCurrentYear();
 				if ($ubccalendarAPI->currentSession == "W")
 					$fserver_label .= '<span style="font-size:10px;color:grey;margin-left:4px;">Winter '.$ubccalendarAPI->currentYear.'</span>';
 				else
@@ -806,7 +810,7 @@ class UBC_Courses {
 	 * @access private
 	 * @return void
 	 */
-	private function getDeptCodes($stickyyear){
+	private function getDeptCodes( $stickyyear = false ){
 		$ubccalendarAPI = new ubcCalendarAPI('', '', true,$stickyyear, false);
 		$xml = simplexml_load_string($ubccalendarAPI->XMLData);
 		if($ubccalendarAPI->fromTransient)
