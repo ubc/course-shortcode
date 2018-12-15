@@ -646,7 +646,7 @@ class UBC_Courses {
 				$output = '';
 				foreach ($xml->course as $courses) {
 				   if ($instructors){
-					   $instrstr = $this->get_courseInstructors($fuzzy,'option_2',$department.$courses[key],$ubccalendarAPI, $profileslug);
+					   $instrstr = $this->get_courseInstructors($fuzzy,'option_2',$department.$courses['key'],$ubccalendarAPI, $profileslug);
 				   } else {
 					$instrstr = '';
 				   }
