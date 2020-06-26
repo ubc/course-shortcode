@@ -432,7 +432,6 @@ class UBC_Courses {
 			 $lev = levenshtein($instrName,$word);
 			 $percentage_match = (($numchar-$lev)/$numchar * 100);
 			 $htmlstr = '';
-
 					 if ($percentage_match > $fuzzy){
 							 $instID = trim(preg_replace('/[ ,]+/','', $instrName));
 							 $instrCourseArray = explode(",",$instrPieces[1]);
@@ -549,7 +548,7 @@ class UBC_Courses {
 		if($_POST['stickyyear'] === "true") $stickyyear = true;
 		//validate in case
 		if ((preg_match("/^[A-Z]*$/", $department))&&(strlen($department) < 5)) {
-	  $ubccalendarAPI = new ubcCalendarAPI($department, '', true, $stickyyear, false);
+	  $ubccalendarAPI = new ubcCalendarAPI($department, '', false, $stickyyear, false);
 		  $xml = simplexml_load_string($ubccalendarAPI->XMLData);
 		  foreach ($xml->course as $courses) {
 			//create array of coursecodes to send to js
@@ -811,7 +810,7 @@ class UBC_Courses {
 	 * @return void
 	 */
 	private function getDeptCodes( $stickyyear = false ){
-		$ubccalendarAPI = new ubcCalendarAPI('', '', true,$stickyyear, false);
+		$ubccalendarAPI = new ubcCalendarAPI('', '', false,$stickyyear, false);
 		$xml = simplexml_load_string($ubccalendarAPI->XMLData);
 		if($ubccalendarAPI->fromTransient)
 		   $fserver_label = '<span style="color:green;"></span>';
@@ -842,7 +841,7 @@ class UBC_Courses {
 	public function enumerate_course($department,$course,$stickyyear){
 		   $instructorArr = array();
 		   $output = array();
-		   $subccalendarAPI = new ubcCalendarAPI($department, $course,true,$stickyyear,true);
+		   $subccalendarAPI = new ubcCalendarAPI($department, $course,false,$stickyyear,true);
 		   $section_xml = simplexml_load_string($subccalendarAPI->XMLData);
 			   if (!empty($section_xml)) {
 				   foreach ($section_xml->section as $sections) {
@@ -1015,7 +1014,7 @@ class UBC_Courses {
 				 "parentslug" => '',
 				 "profileslug" => '',
 				 "instructors" => false,
-				 "stickywinter" => true,
+				 "stickywinter" => false,
 				 "stickyyear" => false,
 				 "desc_category" => '',
 		 "fuzzy" => 80

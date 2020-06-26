@@ -106,15 +106,43 @@ class ubcCalendarAPI {
 	}
 
 
+	/**
+	 * Set the current year.
+	 *
+	 * @return void
+	 */
 	function getCurrentYear() {
-		$currentYear = date( 'Y' );
-		$currentMonth = date( 'n' );
-		if ( ( ( $this->currentSession == 'W' ) && ( $currentMonth > 8 )) || ( $this->stickyyear ) ) {
-			$this -> currentYear = $currentYear;
-		} else {
-			$this -> currentYear = $currentYear - 1;
+
+		// Get the current, right now, calendar year and month.
+		$calendar_year_now  = date( 'Y' );
+		$calendar_month_now = date( 'n' );
+
+		// Default to the previous year.
+		$current_year = $calendar_year_now - 1;
+
+		// If the current session is set to winter and we're later than April, we're in Winter Term 1 of the current calendar year.
+		if ( 'W' === $this->currentSession && $calendar_month_now > 4 ) {
+			$current_year = $calendar_year_now;
 		}
-	}
+
+		// If we're in Jan-Aug then we will show this current calendar year's summer term, if we're forcing the current session to be summer.
+		if ( 'S' === $this->currentSession && $calendar_month_now < 9 ) {
+			$current_year = $calendar_year_now;
+		}
+
+		// If we're in Sept-Dec and forcing summer, then we will ask for next calendar year's summer's courses.
+		if ( 'S' === $this->currentSession && $calendar_month_now >= 9 ) {
+			$current_year = $calendar_year_now + 1;
+		}
+
+		// If we set stickyyear, then we're in the current calendar year.
+		if ( true === $this->stickyyear ) {
+			$current_year = $calendar_year_now;
+		}
+
+		$this->currentYear = $current_year;
+
+	}//end getCurrentYear()
 
 	private function getReq() {
 		if ( $this->isSection ) {
