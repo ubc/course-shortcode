@@ -36,6 +36,9 @@ class UBC_Courses {
 		'option_2' => ""
 	);
 
+	public $options = null;
+	public $option_name = '';
+
 	/**
 	 * Instantiation construction
 	 *
@@ -344,7 +347,7 @@ class UBC_Courses {
 	* @param mixed $ubccalendarAPI
 
 	* @param mixed $profileslug
-	* @return void
+	* @return mixed
 	*/
    private function get_courseInstructors($fuzzy, $option_name, $ubcCourse, $ubccalendarAPI, $profileslug ) {
 		if( !isset( $this->options ) || empty( $this->options ) ) {
@@ -400,9 +403,11 @@ class UBC_Courses {
 	 * @param mixed $stickywinter
 
 	 * @param mixed $instructors
-	 * @return void
+	 * @return mixed
 	 */
 	private function get_instructorCourses( $fuzzy,$option_name, $profileName, $parentslug, $profileslug, $stickywinter,$instructors, $stickyyear, $desc_category ) {
+
+		global $post;
 
 		//if profile name is empty AND your are on a profile AND singular page
 		if ((empty($profileName))&&('profile_cct' == get_post_type($post->ID))&&(is_single())){
@@ -601,7 +606,7 @@ class UBC_Courses {
 	 * @param mixed $stickyyear
 
 	 * @param mixed $desc_category
-	 * @return void
+	 * @return mixed
 	 */
 	private function getList($fuzzy,$department, $course, $pills, $tabs, $tabcount, $parentslug, $opentab, $profileslug, $stickywinter, $instructors, $stickyyear, $desc_category){
 		//include_once 'ubcCalendarAPI.php';
@@ -742,7 +747,7 @@ class UBC_Courses {
 	 * @param mixed $profileslug
 
 	 * @param mixed $stickywinter
-	 * @return void
+	 * @return string
 	 */
 	public function show_section_table($fuzzy,$department,$course,$profileslug,$stickywinter,$stickyyear) {
 			//include_once 'ubcCalendarAPI.php';
@@ -807,7 +812,7 @@ class UBC_Courses {
 	 * getDeptCodes function.
 	 *
 	 * @access private
-	 * @return void
+	 * @return string
 	 */
 	private function getDeptCodes( $stickyyear = false ){
 		$ubccalendarAPI = new ubcCalendarAPI('', '', false,$stickyyear, false);
@@ -836,7 +841,7 @@ class UBC_Courses {
 	 * @param mixed $department
 
 	 * @param mixed $course
-	 * @return void
+	 * @return array
 	 */
 	public function enumerate_course($department,$course,$stickyyear){
 		   $instructorArr = array();
@@ -874,7 +879,7 @@ class UBC_Courses {
 	 * @param mixed $pageName
 
 	 * @param mixed $parentslug
-	 * @return void
+	 * @return string
 	 */
 	private function getDetailsBtn($pageName,$parentslug){
 		   $btnHTML = '';
@@ -902,7 +907,7 @@ class UBC_Courses {
 	 * @param mixed $postName
 
 	 * @param mixed $desc_category
-	 * @return void
+	 * @return string
 	 */
 	private function getDescAccordion($postName,$desc_category){
 			$divHTML = '';
@@ -923,7 +928,7 @@ class UBC_Courses {
 			$postlist = get_posts($args);
 			$post_cats = get_the_category($postlist[0]->ID);
 
-			$filtered_post;
+			$filtered_post = false;
 
 			foreach(($post_cats) as $category) {
 				if ($category->cat_ID == $cat_id)
