@@ -1,7 +1,7 @@
 <?php
 class ubcCalendarAPI {
 
-	private $urlBase = 'http://courses.students.ubc.ca/cs/servlets/SRVCourseSchedule?';
+	private $urlBase = 'http://past.courses.students.ubc.ca/cs/servlets/SRVCourseSchedule?';
 	var $XMLData = '';
 	var $profileData;
 	var $fromTransient = true;

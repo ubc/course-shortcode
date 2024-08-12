@@ -795,8 +795,8 @@ class UBC_Courses {
 				$output = '<table id="ubccsections"><td><strong>Sec</strong></td><td><strong>Activity</strong></td><td><strong>Term</strong></td><td><strong>Day</strong></td><td><strong>Bld</strong></td><td><strong>Instructor</strong></td>';
 				// $output .= '<td><strong>p</strong></td>';
 		foreach ( $xml->section as $sections ) {
-			$ssc_link  = 'https://courses.students.ubc.ca/cs/main?' . 'pname=subjarea&tname=subjareas&req=5&dept=' . $department . '&course=' . $course . '&section=' . $sections['key'] . '&sessyr=' . $ubccalendarAPI->currentYear . '&sesscd=' . $ubccalendarAPI->currentSession;
-			$inst_link = 'https://courses.students.ubc.ca/cs/main?pname=inst&ubcid=' . $sections->instructors->instructor['ubcid'];
+			$ssc_link  = 'https://past.courses.students.ubc.ca/cs/main?' . 'pname=subjarea&tname=subjareas&req=5&dept=' . $department . '&course=' . $course . '&section=' . $sections['key'] . '&sessyr=' . $ubccalendarAPI->currentYear . '&sesscd=' . $ubccalendarAPI->currentSession;
+			$inst_link = 'https://past.courses.students.ubc.ca/cs/main?pname=inst&ubcid=' . $sections->instructors->instructor['ubcid'];
 			$output   .= '<tr><td><a target="_blank" href="' . $ssc_link . '">' . $sections['key'] . '</a></td><td>' . $sections['activity'] . '</td>';
 			$meetings  = $sections->teachingunits->teachingunit->meetings->meeting;
 			$term      = array();
